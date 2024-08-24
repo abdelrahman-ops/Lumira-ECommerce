@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Cards from './components/Cards';
 import ProductDetail from './components/ProductDetail';
+import Nav from './components/Nav';
+import Hero from './components/Hero';
+// import Footer from './components/Footer';
 import './css/App.css';
-
+import './css/Nav.css';
+import './css/Hero.css';
 function App() {
   const [products, setProducts] = useState([]);
 
@@ -13,9 +17,11 @@ function App() {
       .then(response => response.json())
       .then(data => setProducts(data));
   }, []);
-  
+
   return (
     <Router>
+      <Nav />
+      <Hero />
       <div className="container mt-4">
         <Routes>
           <Route path="/" element={
@@ -30,6 +36,7 @@ function App() {
           <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </div>
+
     </Router>
   );
 }

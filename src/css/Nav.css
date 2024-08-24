@@ -1,0 +1,118 @@
+.items{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    margin: 0;
+    font-family: 'outfit', sans-serif;
+    font-size: .875rem;
+    line-height: 1.25rem;
+}
+
+.logo{
+    padding: 0;
+    margin: 0;
+    height: 41px;
+}
+.logo img{
+    width: 144px;
+    height: 41px;
+}
+ul{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px;
+    text-transform: uppercase;
+}
+
+
+.navbar a{
+    text-decoration: none;
+    color: black;
+}
+.navbar a.active{
+    border-bottom: 2px solid black;
+}
+.navbar li a {
+    position: relative;
+    text-decoration: none;
+    padding-bottom: 0.25rem;
+}
+
+/* .navbar li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: black;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+.navbar li a.active::after, .navbar li a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+} */
+
+.admin-link {
+    border: 1px solid #e5e7eb;
+    padding: 4px 20px;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+    /* margin-top: -0.5rem; */
+    display: inline-block;
+    /* height: 23px; */
+    text-transform:none;
+}
+.admin-link p{
+    margin: 0;
+}
+
+
+
+.nav-items{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.search img{
+    width: 20px;
+    height: 20px;
+}
+.group img{
+    width: 20px;
+    height: 24px;
+}
+.bag img{
+    width: 20px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+}
+.bag {
+    position: relative;
+}
+
+.counter {
+    position: absolute;
+    right: -5px;
+    bottom: -20px;
+    width: 16px;
+    text-align: center;
+    line-height: 16px;
+    background-color: black;
+    color: white;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    font-size: 8px;
+}
+
+
