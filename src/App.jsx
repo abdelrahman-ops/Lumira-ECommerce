@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Cards from './components/Cards';
 import ProductDetail from './components/ProductDetail';
-import './App.css';
+import './css/App.css';
 
 function App() {
   const [products, setProducts] = useState([]);
