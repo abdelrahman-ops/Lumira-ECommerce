@@ -1,0 +1,130 @@
+.wed{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    
+    width: 100%;
+    font-family: Outfit;
+}
+
+.policy{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    padding: 70px 0;
+}
+
+.imgCon{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 226px;
+    height: 101px;
+}
+
+.imgCon .title{
+    color: black;
+    /* font-size: 17px; */
+    font-weight: 600;
+}
+.des{
+    --tw-text-opacity: 1;
+    color: rgb(156 163 175 / var(--tw-text-opacity))
+}
+.imgCon img{
+    width: 42px;
+    height: 42px;
+    margin-bottom: 15px;
+}
+
+.imgCon p{
+    margin: 0;
+}
+
+
+
+
+
+
+
+
+.sub{
+    padding: 0 0 70px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+
+.email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.email input[type="email"] {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    outline: none;
+    width: 542px;
+    max-width: 100%;
+    background-color: #fff;
+    color: #111;
+}
+
+.email input[type="email"]::placeholder {
+    color: #999;
+}
+
+.email button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: black;
+    border: 1px solid black;
+    border-radius: 0;
+    cursor: pointer;
+    transition: none;
+}
+
+.email button[type="submit"]:hover {
+    background-color: black;
+}
+
+.sub .con .font-medium{
+    color: black;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 2rem;
+}
+
+
+
+
+
+@media (max-width: 500px) {
+    .email {
+        flex-direction: column;
+    }
+
+    .email input[type="email"] {
+        border-radius: 5px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .email button[type="submit"] {
+        border-radius: 5px;
+        width: 100%;
+    }
+}

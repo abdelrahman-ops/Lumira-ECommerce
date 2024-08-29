@@ -5,11 +5,14 @@ import Home from './components/Home';
 import Collection from './components/Collection';
 import About from './components/About';
 import Contact from './components/Contact';
-import ProductDetail from './components/ProductDetail'; // Import ProductDetail
+import ProductDetail from './components/ProductDetail';
+import Footer from './components/Footer';
 
 import './css/App.css';
 import './css/Nav.css';
 import './css/Hero.css';
+import './css/Settler.css';
+
 
 function App() {
   return (
@@ -22,6 +25,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/product/:id' element={<ProductDetail />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
