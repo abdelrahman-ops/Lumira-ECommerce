@@ -47,13 +47,16 @@ ul{
 }
 
 
-.navbar a{
+/* General styles for navbar links */
+.navbar a {
     text-decoration: none;
     color: black;
 }
-.navbar a.active{
+
+.navbar a.active {
     border-bottom: 0px solid black;
 }
+
 .navbar li a {
     position: relative;
     text-decoration: none;
@@ -72,9 +75,20 @@ ul{
     transform-origin: right;
     transition: transform 0.3s ease;
 }
+
 .navbar li a.active::after, .navbar li a:hover::after {
     transform: scaleX(1);
     transform-origin: left;
+}
+
+/* Specific styles for the admin link to exclude the ::after effect */
+.navbar li a.admin-link {
+    position: static; /* Override to remove the relative position */
+    padding-bottom: 0; /* Remove padding-bottom */
+}
+
+.navbar li a.admin-link::after {
+    content: none; /* Remove the underline effect */
 }
 
 .admin-link {
@@ -82,14 +96,14 @@ ul{
     padding: 4px 20px;
     font-size: 0.75rem;
     border-radius: 9999px;
-    /* margin-top: -0.5rem; */
     display: inline-block;
-    /* height: 23px; */
-    text-transform:none;
+    text-transform: none;
 }
-.admin-link p{
+
+.admin-link p {
     margin: 0;
 }
+
 
 
 

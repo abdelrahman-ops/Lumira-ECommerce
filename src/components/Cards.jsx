@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Cards = ({ product }) => {
@@ -10,7 +10,7 @@ const Cards = ({ product }) => {
                 <p className="card-text">{product.rating.rate}</p>
                 <div>
                     <Link to={`/product/${product.id}`} className="btn btn-primary">Watch More</Link>
-                    <a href="#" className="btn btn-secondary"><span class="material-symbols-outlined">add_shopping_cart</span></a>
+                    <a href="#" className="btn btn-secondary"><span className="material-symbols-outlined">add_shopping_cart</span></a>
                 </div>
             </div>
         </div>

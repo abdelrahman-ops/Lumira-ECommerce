@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom';
+// import { useState } from 'react'
+// import { NavLink } from 'react-router-dom';
 import Nav2 from './Nav2';
 
 const Nav = () => {
 
 
-    const [active, setActive] = useState('./');
+    // const [active, setActive] = useState('./');
     
     return (
         // <div className='items'>
