@@ -1,0 +1,16 @@
+import axios from "axios"
+import {useState} from "react"
+
+
+export function getData(url){
+    axios
+    .get(`https://pm.alexondev.net/api/${url}`, {
+        headers: {
+            // Authorization: `Bearer ${Cookies.get("stable")}`,
+        },
+    })
+    .then((res) => setData(res.data))
+    .catch((err) => console.log((err))
+    .finally(() => setLoading(false));
+    )
+}
