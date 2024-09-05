@@ -1,6 +1,7 @@
 // import { useState } from 'react'
 // import { NavLink } from 'react-router-dom';
-import Nav2 from './Nav2';
+// import Nav2 from './Nav2';
+import Nav3 from './Nav3';
 
 const Nav = () => {
 
@@ -51,7 +52,7 @@ const Nav = () => {
         // </div>
 
         <div>
-            <Nav2 />
+            <Nav3 />
         </div>
     )
 }

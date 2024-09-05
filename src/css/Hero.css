@@ -1,11 +1,12 @@
-.hero-container {
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap");
+
+/* .hero-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     border: 1px solid #727272;
     flex-wrap: wrap;
-    /* background-color: #727272; */
-    /* width: 1105.120px; */
+    
     margin-left: 4px;
 }
 
@@ -15,8 +16,7 @@
     justify-content: center;
     max-width: 100%;
     line-height: 1.5;
-    /* display: block; */
-    /* background-color: #727272; */
+    
 }
 
 .flex {
@@ -34,7 +34,7 @@
     height: 2px;
     width: 50px;
     background-color: #000;
-    margin-right: 10px; /* Space between line and text */
+    margin-right: 10px;
 }
 
 .text {
@@ -62,9 +62,8 @@
     border: 0;
 }
 .image-container img{
-    /* width: 559px; */
     height: 448px;
-}
+} */
 /* Responsive Styles */
 /* @media (max-width: 768px) {
     .hero-container {
@@ -79,3 +78,10 @@
         font-size: 1.5rem;
     }
 } */
+
+
+#la{
+    font-family: "Prata", serif;
+    font-weight: 400;
+    font-style: normal;
+}

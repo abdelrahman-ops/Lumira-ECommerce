@@ -1,4 +1,4 @@
-nav{
+/* nav{
     padding: 0;
     margin: 0;
 }
@@ -12,11 +12,9 @@ nav{
     font-size: .875rem;
     line-height: 1.25rem;
     gap: 170px;
-    /* background-color: rgb(146, 109, 109); */
 }
 .bg-body-tertiary{
     --bs-bg-opacity: 0;
-    /* background-color: white; */
 }
 .navbar{
     padding: 0;
@@ -47,7 +45,7 @@ ul{
 }
 
 
-/* General styles for navbar links */
+
 .navbar a {
     text-decoration: none;
     color: black;
@@ -81,14 +79,14 @@ ul{
     transform-origin: left;
 }
 
-/* Specific styles for the admin link to exclude the ::after effect */
+
 .navbar li a.admin-link {
-    position: static; /* Override to remove the relative position */
-    padding-bottom: 0; /* Remove padding-bottom */
+    position: static;
+    padding-bottom: 0;
 }
 
 .navbar li a.admin-link::after {
-    content: none; /* Remove the underline effect */
+    content: none;
 }
 
 .admin-link {
@@ -145,5 +143,60 @@ ul{
     border-radius: 50%;
     font-size: 8px;
 }
+ */
 
 
+
+
+
+
+ul p{
+    font-size: .875rem;
+    line-height: 1.25rem;
+    text-transform: uppercase;
+}
+.admin{
+    font-size: .75rem;
+    line-height: 1rem;
+    text-transform: none;
+}
+
+ul a.active{
+    border-bottom: 0px solid black;
+}
+
+ul a {
+    position: relative;
+}
+
+ul a::after {
+    content: '';
+    position: relative;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    height: 1px;
+    background-color: #494949;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+ul a.active::after, ul  a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+ul a.admin-link {
+    position: static;
+    padding-bottom: 0;
+}
+
+.navbar li a.admin-link::after {
+    content: none;
+}
+
+.drop a.active{
+    background-color: black;
+    color: white;
+}
