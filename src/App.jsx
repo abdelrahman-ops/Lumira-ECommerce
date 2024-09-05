@@ -17,6 +17,7 @@ import './css/Settler.css';
 import { createContext } from 'react';
 
 import { products } from "./assets/frontend_assets/assets";
+import Login from './pages/Login';
 
 export const shop = createContext();
 
@@ -31,7 +32,7 @@ function App() {
 		<>
 		<shop.Provider value={value}>
 			<Router>
-				<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
+				<div className='px-4 sm:px-[4vw] md:px-[6vw] lg:px-[7vw]'>
 					<Nav3 />
 					
 					<Routes>
@@ -40,6 +41,7 @@ function App() {
 						<Route path='/about' element={<About />} />
 						<Route path='/contact' element={<Contact />} />
 						<Route path='/product/:id' element={<ProductDetail />} />
+						<Route path='/login' element={<Login />} />
 					</Routes>
 					
 					<Footer />
