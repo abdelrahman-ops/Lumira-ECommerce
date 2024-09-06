@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -32,7 +33,7 @@ function App() {
 		<>
 		<shop.Provider value={value}>
 			<Router>
-				<div className='px-4 sm:px-[4vw] md:px-[6vw] lg:px-[7vw]'>
+				<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
 					<Nav3 />
 					
 					<Routes>
