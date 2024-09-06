@@ -9,7 +9,7 @@ const Latest = () => {
 
     useEffect(() => {
         if (products && products.length > 0) {
-            setLatest(products.slice(14, 24));
+            setLatest(products.slice(24, 29));
         }
     }, [products]);
 
