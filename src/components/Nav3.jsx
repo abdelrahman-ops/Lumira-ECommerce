@@ -47,7 +47,7 @@ const Nav3 = () => {
                         src={assets.profile_icon}
                         alt=""
                         className="w-5 cursor-pointer"
-                        onClick={() => navigate("/login")}
+                        onClick={() => navigate("/login" , { state: { showSignUp: false } })}
                     />
                 </div>
 
