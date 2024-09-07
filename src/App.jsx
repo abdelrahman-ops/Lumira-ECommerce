@@ -13,7 +13,7 @@ import Collection from './pages/Collection';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import Cart from './pages/Cart';
+import Cart2 from './pages/Cart2';
 
 import Nav3 from './components/Nav3';
 import ProductDetail from './components/ProductDetail';
@@ -51,17 +51,14 @@ function App() {
 							<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
 							<Routes>
+
 								<Route path='/' element={<Home />} />
 								<Route path='/collection' element={<Collection />} />
 								<Route path='/about' element={<About />} />
 								<Route path='/contact' element={<Contact />} />
 								<Route path='/login' element={<Login />} />
 								<Route path='/profile' element={<Profile />} />
-								<Route 
-									path='/cart' 
-									element={
-											<Cart />
-										} />
+								<Route path='/cart' element={<Cart2 />} />
 								
 								<Route path='/product/:id' element={<ProductDetail />} />
 							</Routes>
