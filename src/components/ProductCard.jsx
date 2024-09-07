@@ -20,7 +20,7 @@ const ProductCard = ({ _id, name, price, image }) => {
                 </div>
                 <div>
                     <p className="pt-3 pb-1 text-sm h-16">{name}</p>
-                    <p className="flex justify-between text-sm font-medium">
+                    <div className="flex justify-between text-sm font-medium">
                         {currency}{price}
                         <div className="flex items-center gap-2">
                             {/* <button className="p-0 m-0" onClick={handleFavoriteClick}>
@@ -35,7 +35,7 @@ const ProductCard = ({ _id, name, price, image }) => {
                                 <span className="material-symbols-outlined">add_shopping_cart</span>
                             </button>
                         </div>
-                    </p>
+                    </div>
                 </div>
             </div>
         </Link>
