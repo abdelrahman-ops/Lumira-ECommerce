@@ -1,15 +1,33 @@
 import { useState } from "react";
 import { assets } from "../assets/frontend_assets/assets";
 import {NavLink, useNavigate } from "react-router-dom";
+// import { useAuth } from '../customHook/AuthContext';
+import Cookies from "js-cookie";
 
 const Nav3 = () => {
-    const [visible, setVisible] = useState(false);
+
+    // const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+
+    const handleLoginClick = () => {
+        const token = Cookies.get('token');
+
+        if (token) {
+            navigate('/profile');
+        } else {
+            navigate('/login', { state: { showSignUp: false } });
+        }
+    };
+
+
+    const [visible, setVisible] = useState(false);
     const handleNavLinkClick = () => {
         setTimeout(() => {
             setVisible(false);
         }, 200);
     };
+    
+    
     return (
         <div className="flex items-center justify-between py-5 m-0 font-medium">
             <a href="/">
@@ -47,7 +65,7 @@ const Nav3 = () => {
                         src={assets.profile_icon}
                         alt=""
                         className="w-5 cursor-pointer"
-                        onClick={() => navigate("/login" , { state: { showSignUp: false } })}
+                        onClick={handleLoginClick}
                     />
                 </div>
 
