@@ -2,64 +2,104 @@ import { useFormik} from 'formik';
 import * as Yup from 'yup';
 
 import { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation , useNavigate} from 'react-router-dom';
+
+import Cookies from "js-cookie";
+import { useAuth } from '../customHook/AuthContext';
+
+
 
 const Login = () => {
-    
+    const { login } = useAuth();
+    const navigate = useNavigate();
     const location = useLocation();
+
     const [showSignUp, setShowSignUp] = useState(false);
+    // const [showLogOut, setLogout] = useState(false);
     
+    const handleLoginSuccess = (token) =>{
+        
+        Cookies.set("token", token)
+        login();
+        toast.success("Login successful!");
+        
+        const redirectPath = location.state?.from?.pathname || '/';
+        navigate(redirectPath);
+        
+    }
+
     useEffect(() => {
         if (location.state?.showSignUp === false) {
             setShowSignUp(false);
         }
     }, [location.state]);
     
-            // SCHEMA FOR VALIDATION
-            const schema = Yup.object().shape({
-                email: Yup.string()
-                    .email("Invalid email format")
-                    .required("Email is required"),
-                password: Yup.string()
-                    .min(8, "Password must be at least 8 characters long")
-                    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-                    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-                    .matches(/\d/, "Password must contain at least one number")
-                    .matches(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character")
-                    .required("Password is required"),
-            });
+    // SCHEMA FOR VALIDATION
+    const schema = Yup.object().shape({
+        email: Yup.string()
+            .email("Invalid email format")
+            .required("Email is required"),
+        password: Yup.string()
+            .min(8, "Password must be at least 8 characters long")
+            .matches(/\d/, "Password must contain at least one number")
+            // .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+            // .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+            // .matches(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character")
+            .required("Password is required"),
+    });
             
     
 
 
-            // SIGN IN FORM
+    // SIGN IN FORM handling
     const formikLogin = useFormik({
         initialValues: {
             email: "",
             password: "",
         },
         validationSchema: schema ,
+        
         onSubmit: values => {
-            const missing = [];
-            if (!values.email) {
-                missing.push("Email");
-            }
-            if (!values.password) {
-                missing.push("Password");
-            }
+            fetch("https://pm.alexondev.net/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            })
+            .then((res)=> res.json())
+            .then(res => {
+                // console.log(res.data.user);
+                if (res.data && res.data.user.token) {
+                    handleLoginSuccess(res.data.user.token);
+                } else {
+                    toast.error("Invalid credentials!");
+                }
+            })
+            .catch(() => toast.error("An error occurred!"));
+            
+            
+        //     const missing = [];
+        //     if (!values.email) {
+        //         missing.push("Email");
+        //     }
+        //     if (!values.password) {
+        //         missing.push("Password");
+        //     }
 
-            if (missing.length > 0) {
-            toast.error(`Please fill in ${missing.join(", ")}`);
-        } else {
-            toast.success("Login successful!");
-        }
+        //     if (missing.length > 0) {
+        //     toast.error(`Please fill in ${missing.join(", ")}`);
+        // } else {
+        //     toast.success("Login successful!");
+        // }
+        
         },
     });
 
     
-            // signup form  
+    // SIGN UP FORM handling  
     const formikSignUp = useFormik({
         initialValues: {
             name: "",
@@ -88,7 +128,7 @@ const Login = () => {
 
     return (
         <div className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800">
-            <ToastContainer />
+            {/* <ToastContainer /> */}
             
             {!showSignUp ? (
                 
