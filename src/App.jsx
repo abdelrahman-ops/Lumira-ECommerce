@@ -5,7 +5,7 @@ import { createContext } from 'react';
 import { ToastContainer } from 'react-toastify';
 
 import { AuthProvider } from './customHook/AuthContext';
-import  PrivateRoute  from './customHook/PrivateRoute';
+// import  PrivateRoute  from './customHook/PrivateRoute';
 import {DataProvider} from './customHook/DataContext';
 
 import Home from './pages/Home';
@@ -60,9 +60,7 @@ function App() {
 								<Route 
 									path='/cart' 
 									element={
-										<PrivateRoute>
 											<Cart />
-										</PrivateRoute>
 										} />
 								
 								<Route path='/product/:id' element={<ProductDetail />} />
