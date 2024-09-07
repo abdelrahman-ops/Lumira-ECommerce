@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 
 import { AuthProvider } from './customHook/AuthContext';
 import  PrivateRoute  from './customHook/PrivateRoute';
+import {DataProvider} from './customHook/DataContext';
 
 import Home from './pages/Home';
 import Collection from './pages/Collection';
@@ -42,30 +43,35 @@ function App() {
 		<>
 		<shop.Provider value={value}>
 			<AuthProvider>
-				<Router>
-					<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-						<Nav3 />
-						<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-						<Routes>
-							<Route path='/' element={<Home />} />
-							<Route path='/collection' element={<Collection />} />
-							<Route path='/about' element={<About />} />
-							<Route path='/contact' element={<Contact />} />
-							<Route path='/login' element={<Login />} />
-							<Route path='/profile' element={<Profile />} />
-							<Route 
-								path='/cart' 
-								element={
-									<PrivateRoute>
-										<Cart />
-									</PrivateRoute>
-									} />
-							<Route path='/product/:id' element={<ProductDetail />} />
-						</Routes>
-						
-						<Footer />
-					</div>
-				</Router>
+				<DataProvider>
+
+					<Router>
+						<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
+							<Nav3 />
+							<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
+							<Routes>
+								<Route path='/' element={<Home />} />
+								<Route path='/collection' element={<Collection />} />
+								<Route path='/about' element={<About />} />
+								<Route path='/contact' element={<Contact />} />
+								<Route path='/login' element={<Login />} />
+								<Route path='/profile' element={<Profile />} />
+								<Route 
+									path='/cart' 
+									element={
+										<PrivateRoute>
+											<Cart />
+										</PrivateRoute>
+										} />
+								<Route path='/product/:id' element={<ProductDetail />} />
+							</Routes>
+
+							<Footer />
+						</div>
+					</Router>
+
+				</DataProvider>
 			</AuthProvider>
 		</shop.Provider>
 		</>
