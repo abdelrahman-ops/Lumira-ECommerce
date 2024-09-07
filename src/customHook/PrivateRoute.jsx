@@ -8,8 +8,9 @@ const PrivateRoute = ({ children }) => {
     const location = useLocation();
 
     const token = Cookies.get("token");
+    const authenticated = isAuthenticated || !!token;
 
-    if (!isAuthenticated && !token) {
+    if (!authenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

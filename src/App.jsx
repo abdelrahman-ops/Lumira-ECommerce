@@ -64,6 +64,7 @@ function App() {
 											<Cart />
 										</PrivateRoute>
 										} />
+								
 								<Route path='/product/:id' element={<ProductDetail />} />
 							</Routes>
 

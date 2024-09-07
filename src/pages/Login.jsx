@@ -23,11 +23,11 @@ const Login = () => {
     
     const handleLoginSuccess = (token) =>{
         Cookies.set("token", token)
-        login();
+        login(token);
         toast.success("Login successful!");
         
         const redirectPath = location.state?.from?.pathname || '/';
-        navigate(redirectPath);
+        navigate(redirectPath, { replace: true });
         
     }
 
