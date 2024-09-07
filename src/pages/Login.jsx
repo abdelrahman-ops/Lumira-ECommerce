@@ -8,11 +8,13 @@ import { useLocation , useNavigate} from 'react-router-dom';
 
 import Cookies from "js-cookie";
 import { useAuth } from '../customHook/AuthContext';
+import { useData } from '../customHook/DataContext';
 
 
 
 const Login = () => {
     const { login } = useAuth();
+    const { storeData } = useData();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -20,7 +22,6 @@ const Login = () => {
     // const [showLogOut, setLogout] = useState(false);
     
     const handleLoginSuccess = (token) =>{
-        
         Cookies.set("token", token)
         login();
         toast.success("Login successful!");
@@ -71,9 +72,12 @@ const Login = () => {
             })
             .then((res)=> res.json())
             .then(res => {
-                // console.log(res.data.user);
                 if (res.data && res.data.user.token) {
                     handleLoginSuccess(res.data.user.token);
+                    console.log("User data before storing:", res.data.user);
+                    storeData(res.data.user);
+                    console.log("Stored data successfully.");
+
                 } else {
                     toast.error("Invalid credentials!");
                 }
