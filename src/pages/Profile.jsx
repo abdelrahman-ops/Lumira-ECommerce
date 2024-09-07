@@ -2,25 +2,25 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useAuth } from '../customHook/AuthContext';
 import { useData } from '../customHook/DataContext';
-
+import { assets } from "../assets/frontend_assets/assets";
 import Title from "../components/Title";
 import { shop } from "../App";
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 const Profile = () => {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const { products } = useContext(shop);
+    const [show, setShow] = useState(true);
     
     const {data} = useData();
-    
-    
     if (!data) {
         return <p>No user data found. Please log in again.</p>;
     }
     // console.log(data.name);
     
     
+
     const handleLogout = () => {
         Cookies.remove('token');
         logout();
@@ -31,35 +31,46 @@ const Profile = () => {
 
     return (
         <>
-            <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t ">
                 
-                <div className="min-w-60 border border-gray-300">
+                <div className={`min-w-60 border border-gray-300 `}>
                     
-                    <div className="flex flex-row pl-5 py-3 justify-start gap-7 items-center">
-                        <img src={products[1].image} alt="Profile" className="w-24 h-24 rounded-full" />
-                        <div className="flex flex-col text-xl items-center gap-0">
+                    <div className="flex flex-row pl-5 py-3 items-center relative">
+                        <div className="flex flex-row gap-4 items-center">
+                            <img src={products[1].image} alt="Profile" className="w-24 h-24 rounded-full" />
+                            <div className="flex flex-col text-xl items-start">
                             <p className="text-gray-500">HELLO</p>
                             <p className="text-gray-700 font-medium">{data.name}</p>
+                            </div>
                         </div>
+                        <img
+                            src={assets.dropdown_icon}
+                            alt=""
+                            className={`h-3 sm:hidden absolute bottom-0 right-0 mx-3 my-3 ${show ? "rotate-90" : ""}`}
+                            onClick={() => setShow(!show)}
+                        />
                     </div>
 
 
-                    <div className="border-t border-gray-300 pl-5 py-3 bg-gray-400">
-                        <p className="mb-0 text-sm font-medium">My Account</p>
-                    </div>
-                    <div className="border-t border-gray-300 pl-5 py-3">
-                        <p className="mb-0 text-sm font-medium">My Orders</p>
-                    </div>
-                    <div className="border-t border-gray-300 pl-5 py-3">
-                        <p className="mb-0 text-sm font-medium">My Wish List</p>
-                    </div>
-                    <div className="border-t border-gray-300 pl-5 py-3">
-                        <button 
-                            onClick={handleLogout} 
-                            className="text-sm font-medium text-red-600 hover:text-red-800"
-                        >
-                            Logout
-                        </button>
+                    
+                    <div className={`${show ? "" : "hidden"}`}>
+                        <div className="border-t border-gray-300 pl-5 py-3 bg-gray-400 cursor-pointer">
+                            <p className="mb-0 text-sm font-medium ">My Account</p>
+                        </div>
+                        <div className="border-t border-gray-300 pl-5 py-3 hover:bg-gray-300 cursor-pointer">
+                            <p className="mb-0 text-sm font-medium">My Orders</p>
+                        </div>
+                        <div className="border-t border-gray-300 pl-5 py-3 hover:bg-gray-300 cursor-pointer">
+                            <p className="mb-0 text-sm font-medium">My Wish List</p>
+                        </div>
+                        <div className="border-t border-gray-300 pl-5 py-3  cursor-pointer">
+                            <button 
+                                onClick={handleLogout} 
+                                className="text-sm font-medium text-red-600 hover:text-red-800"
+                            >
+                                Logout
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -72,15 +83,15 @@ const Profile = () => {
                     {/* Updated Personal Information Fields */}
                     <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-6">
                     {/* Profile Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div className='flex items-center gap-4'>
+                        <div className="flex items-center flex-wrap justify-between mb-6">
+                            <div className='flex items-center gap-4 max-sm:hidden'>
                                 <img src={products[1].image} alt="Profile" className="w-32 h-32 rounded-full" />
                                 <div>
                                     <p className="text-lg font-semibold">{"Name"}</p>
                                     <p className="text-sm text-gray-500">{data.name}</p>
                                 </div>
                             </div>
-                            <div className="text-sm px-2">
+                            <div className="text-sm px-2 sm:mt-5  ">
                                 <p className="text-blue-500 hover:underline cursor-pointer">Change Profile Information</p>
                             </div>
                         </div>
