@@ -1,7 +1,7 @@
 // import React from 'react'
 
 
-const Collection = () => {
+const About = () => {
     return (
         <>
             <h1>This is About</h1>
@@ -9,4 +9,4 @@ const Collection = () => {
     )
 }
 
-export default Collection
+export default About

@@ -27,7 +27,7 @@ const Login = () => {
         toast.success("Login successful!");
         
         const redirectPath = location.state?.from?.pathname || '/';
-        navigate(redirectPath, { replace: true });
+        navigate(redirectPath);
         
     }
 
@@ -74,9 +74,9 @@ const Login = () => {
             .then(res => {
                 if (res.data && res.data.user.token) {
                     handleLoginSuccess(res.data.user.token);
-                    console.log("User data before storing:", res.data.user);
+                    // console.log("User data before storing:", res.data.user);
                     storeData(res.data.user);
-                    console.log("Stored data successfully.");
+                    // console.log("Stored data successfully.");
 
                 } else {
                     toast.error("Invalid credentials!");
@@ -132,8 +132,6 @@ const Login = () => {
 
     return (
         <div className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800">
-            {/* <ToastContainer /> */}
-            
             {!showSignUp ? (
                 
                 <form className="flex flex-col items-center w-full gap-4" onSubmit={formikLogin.handleSubmit}>

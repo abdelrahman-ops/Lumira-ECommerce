@@ -27,6 +27,10 @@ import './css/Settler.css';
 
 import { products } from "./assets/frontend_assets/assets";
 import Profile from './pages/Profile';
+import ProtectedRoute from './components/ProtectedRoute';
+import Error from './pages/Error';
+
+
 
 
 
@@ -58,7 +62,8 @@ function App() {
 								<Route path='/contact' element={<Contact />} />
 								<Route path='/login' element={<Login />} />
 								<Route path='/profile' element={<Profile />} />
-								<Route path='/cart' element={<Cart2 />} />
+								<Route path='/error' element={<Error />} />
+								<Route path='/cart' element={<ProtectedRoute> <Cart2 /> </ProtectedRoute>} />
 								
 								<Route path='/product/:id' element={<ProductDetail />} />
 							</Routes>

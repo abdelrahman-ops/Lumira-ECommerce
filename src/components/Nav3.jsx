@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { assets } from "../assets/frontend_assets/assets";
-import {NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 // import { useAuth } from '../customHook/AuthContext';
 import Cookies from "js-cookie";
 
@@ -18,6 +18,15 @@ const Nav3 = () => {
             navigate('/login', { state: { showSignUp: false } });
         }
     };
+
+    const handleCartClick = () =>{
+        const token = Cookies.get('token');
+        if (token) {
+            navigate('/cart');
+        } else {
+            navigate('/error');
+        }
+    }
 
 
     const [visible, setVisible] = useState(false);
@@ -69,10 +78,10 @@ const Nav3 = () => {
                     />
                 </div>
 
-                <a className="relative" href="/cart">
+                <div className="relative cursor-pointer" onClick={handleCartClick}>
                     <img src={assets.cart_icon} className="w-5 min-w-5" alt="" />
                     <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">0</p>
-                </a>
+                </div>
                 
                 {/* Drop Down icon */}
                 <img 
@@ -83,7 +92,7 @@ const Nav3 = () => {
                 />
             </div>
             {/* side bar for small screens */}
-            <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${ visible ? "w-full" : "w-0" }`}>
+            <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all z-10 ${ visible ? "w-full" : "w-0" }`}>
                 <div className="drop flex flex-col text-gray-600">
                     <div className="flex items-center gap-4 p-3 cursor-pointer w-full" onClick={() => setVisible(false)}>
                         <img src={assets.dropdown_icon} alt="" className="h-4 rotate-180" />
