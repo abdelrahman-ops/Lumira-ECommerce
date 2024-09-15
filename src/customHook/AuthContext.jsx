@@ -23,6 +23,8 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         Cookies.remove("token");
+        localStorage.removeItem('cartItems');
+        localStorage.removeItem('userData');
         setIsAuthenticated(false);
     };
 
