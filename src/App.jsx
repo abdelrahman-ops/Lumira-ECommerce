@@ -13,7 +13,7 @@ import Collection from './pages/Collection';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import Cart2 from './pages/Cart2';
+import Cart from './pages/Cart';
 
 import Nav3 from './components/Nav3';
 import ProductDetail from './components/ProductDetail';
@@ -29,6 +29,8 @@ import { products } from "./assets/frontend_assets/assets";
 import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import Error from './pages/Error';
+import WishList from './pages/WishList';
+import { CartProvider } from './customHook/CartContext';
 
 
 
@@ -48,30 +50,27 @@ function App() {
 		<shop.Provider value={value}>
 			<AuthProvider>
 				<DataProvider>
-
-					<Router>
-						<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-							<Nav3 />
-							<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-
-							<Routes>
-
-								<Route path='/' element={<Home />} />
-								<Route path='/collection' element={<Collection />} />
-								<Route path='/about' element={<About />} />
-								<Route path='/contact' element={<Contact />} />
-								<Route path='/login' element={<Login />} />
-								<Route path='/profile' element={<Profile />} />
-								<Route path='/error' element={<Error />} />
-								<Route path='/cart' element={<ProtectedRoute> <Cart2 /> </ProtectedRoute>} />
-								
-								<Route path='/product/:id' element={<ProductDetail />} />
-							</Routes>
-
-							<Footer />
-						</div>
-					</Router>
-
+					<CartProvider>
+						<Router>
+							<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
+								<Nav3 />
+								<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+								<Routes>
+									<Route path='/' element={<Home />} />
+									<Route path='/collection' element={<Collection />} />
+									<Route path='/about' element={<About />} />
+									<Route path='/contact' element={<Contact />} />
+									<Route path='/login' element={<Login />} />
+									<Route path='/profile' element={<Profile />} />
+									<Route path='/error' element={<Error />} />
+									<Route path='/cart' element={<ProtectedRoute> <Cart /> </ProtectedRoute>} />
+									<Route path='/wishlist' element={<WishList />} />
+									<Route path='/product/:id' element={<ProductDetail />} />
+								</Routes>
+								<Footer />
+							</div>
+						</Router>
+					</CartProvider >
 				</DataProvider>
 			</AuthProvider>
 		</shop.Provider>
