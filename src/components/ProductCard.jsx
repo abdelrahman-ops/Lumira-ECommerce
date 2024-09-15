@@ -28,9 +28,11 @@ const ProductCard = ({ _id, name, price, image }) => {
                                 isFavorited ? 'text-red-600' : 'text-gray-500'
                             }`}>favorite</span> 
                             </button> */}
-                            <button className="p-0 m-0">
-                                <span className="material-symbols-outlined">favorite</span> 
-                            </button>
+                            {/* <Link to="/wishlist"> */}
+                                <button className="p-0 m-0">
+                                    <span className="material-symbols-outlined">favorite</span> 
+                                </button>
+                            {/* </Link> */}
                             <button className="p-0 m-0">
                                 <span className="material-symbols-outlined">add_shopping_cart</span>
                             </button>
