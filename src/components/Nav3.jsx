@@ -3,8 +3,10 @@ import { assets } from "../assets/frontend_assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
 // import { useAuth } from '../customHook/AuthContext';
 import Cookies from "js-cookie";
+import { useCart } from '../customHook/CartContext';
 
 const Nav3 = () => {
+    const { totalQuantity } = useCart();
 
     // const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
@@ -80,7 +82,9 @@ const Nav3 = () => {
 
                 <div className="relative cursor-pointer" onClick={handleCartClick}>
                     <img src={assets.cart_icon} className="w-5 min-w-5" alt="" />
-                    <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">0</p>
+                    <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">
+                        <span>{totalQuantity}</span>
+                    </p>
                 </div>
                 
                 {/* Drop Down icon */}
