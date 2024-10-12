@@ -62,10 +62,14 @@ const Nav3 = () => {
                 <NavLink className="flex flex-col items-center gap-1 m-0" aria-current="page" to="/contact">
                     <p className="text-sm">contact</p>
                 </NavLink>
-                
-                <a href="https://ecom-admin" target="_blank" className="border px-5 text-xs py-1 rounded-full -mt-2">
+
+                <a className="border px-5 text-xs py-1 rounded-full -mt-2" target="_blank" href="http://localhost:5173/admin"  to="/admin">
                     <p className="mt-1 admin">Admin Panel</p>
                 </a>
+                
+                {/* <a href="https://ecom-admin" target="_blank" className="border px-5 text-xs py-1 rounded-full -mt-2">
+                    <p className="mt-1 admin">Admin Panel</p>
+                </a> */}
 
             </ul>
             <div className="flex items-center gap-6">
