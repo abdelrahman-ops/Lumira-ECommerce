@@ -13,7 +13,7 @@ export const DataProvider = ({ children }) => {
     const storeData = (receivedData) => {
         // console.log("Setting data in context:", receivedData);
         setData(receivedData);
-        // localStorage.setItem('userData', JSON.stringify(receivedData));
+        localStorage.setItem('userData', JSON.stringify(receivedData));
     };
 
     const clearData = () => {
