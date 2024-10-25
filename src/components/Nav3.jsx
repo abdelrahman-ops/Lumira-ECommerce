@@ -63,7 +63,7 @@ const Nav3 = () => {
                     <p className="text-sm">contact</p>
                 </NavLink>
 
-                <a className="border px-5 text-xs py-1 rounded-full -mt-2" target="_blank" href="http://localhost:5173/admin"  to="/admin">
+                <a className="border px-5 text-xs py-1 rounded-full -mt-2" target="_blank" href="https://44ever.netlify.app/admin"  to="/admin">
                     <p className="mt-1 admin">Admin Panel</p>
                 </a>
                 
@@ -123,7 +123,7 @@ const Nav3 = () => {
                         <h2>CONTACT</h2>
                     </NavLink>
                     
-                    <a href="https://ecom-admin" className="py-2 pl-6 border w-full">
+                    <a href="https://44ever.netlify.app/admin" className="py-2 pl-6 border w-full">
                         <h2>Admin Panel</h2>
                     </a>
             
