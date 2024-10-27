@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
+import axios from 'axios';
 import { createContext, useContext, useState, useEffect } from 'react';
-
 
 const DataContext = createContext();
 
@@ -20,13 +20,28 @@ export const DataProvider = ({ children }) => {
         setData(null);
         localStorage.removeItem('userData')
     };
-
+    
     useEffect(() => {
-        const storedData = localStorage.getItem('userData');
-        if (storedData) {
-            setData(JSON.parse(storedData));  // Set data from localStorage on page load
-        }
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://localhost:5050/api/users/profile', {
+                    withCredentials: true,
+                });
+                storeData(response.data.user);
+                // console.log(response, "response from context");
+                
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+                const storedData = localStorage.getItem('userData');
+                if (storedData) {
+                    setData(JSON.parse(storedData));
+                }
+            }
+        };
+    
+        fetchUserData();
     }, []);
+    
 
     return (
         <DataContext.Provider value={{storeData , clearData , data }}>
