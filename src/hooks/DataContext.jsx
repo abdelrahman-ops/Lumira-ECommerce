@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import axios from 'axios';
 import { createContext, useContext, useState, useEffect } from 'react';
-
+import Cookies from 'js-cookie';
 const DataContext = createContext();
 
 export const useData = () => useContext(DataContext);
@@ -25,6 +25,9 @@ export const DataProvider = ({ children }) => {
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('https://server-e-commerce-seven.vercel.app/api/users/profile', {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('token')}`,
+                    },
                     withCredentials: true,
                 });
                 storeData(response.data.user);

@@ -90,6 +90,7 @@ const Profile = () => {
     
             const response = await axios.put('https://server-e-commerce-seven.vercel.app/api/users/update', formDataToSubmit, {
                 headers: {
+                    Authorization: `Bearer ${Cookies.get('token')}`,
                     'Content-Type': 'multipart/form-data',
                 },
                 withCredentials: true,
