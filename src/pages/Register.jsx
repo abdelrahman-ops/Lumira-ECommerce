@@ -6,10 +6,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { useLocation , useNavigate} from 'react-router-dom';
 import Cookies from "js-cookie";
-import { useAuth } from '../customHook/AuthContext';
-import { useData } from '../customHook/DataContext';
+import { useAuth } from '../hooks/AuthContext';
+import { useData } from '../hooks/DataContext';
 import axios from 'axios';
-import PhoneNumberInput from '../customHook/PhoneNumberInput';
+import PhoneNumberInput from '../hooks/PhoneNumberInput';
 
 
 const Register = () => {
