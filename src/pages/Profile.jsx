@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios'; // Import axios for API calls
 import PhoneNumberInput from '../hooks/PhoneNumberInput';
 import ProfileLoader from '../components/ProfileLoader';
+// import PhoneNumberDisplay from '../hooks/PhoneNumberDisplay';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -16,8 +17,10 @@ const Profile = () => {
     const [show, setShow] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
+
     
     const [formData, setFormData] = useState({
+        id: '',
         firstName: '',
         lastName: '',
         number: '',
@@ -27,16 +30,15 @@ const Profile = () => {
         image: null,
     });
     
-    const { data } = useData();
+    const { data , storeData} = useData();
     
     useEffect(() => {
         if (data) {
             const timer = setTimeout(() => {
                 setIsLoading(false);
-            }, 2000);
-
-            // Initialize form data
+            }, 1000);
             setFormData({
+                id: data.id,
                 firstName: data.firstName,
                 lastName: data.lastName,
                 number: data.number,
@@ -58,7 +60,6 @@ const Profile = () => {
     
     const handleEditClick = () => {
         setIsEditing(true);
-        console.log("clicked");
     };
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -79,29 +80,34 @@ const Profile = () => {
         }
     };
 
-    const handleSubmit = async (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
         try {
             const formDataToSubmit = new FormData();
             Object.keys(formData).forEach(key => {
                 formDataToSubmit.append(key, formData[key]);
             });
-
+    
             const response = await axios.put('http://localhost:5050/api/users/update', formDataToSubmit, {
                 headers: {
-                    'Content-Type': 'multipart/form-data', // Set headers for file upload
+                    'Content-Type': 'multipart/form-data',
                 },
+                withCredentials: true,
             });
-
-            // Update local data with response
+    
             setFormData(response.data);
-            setIsEditing(false); // Exit edit mode
-            // Optionally, you can trigger a success notification
+            storeData(response.data);
+            setIsEditing(false);
+    
+            window.location.reload();
         } catch (error) {
             console.error('Error updating profile:', error);
-            // Handle error (e.g., show a notification)
         }
     };
+    
+    
+    
+    
 
     if (isLoading) {
         return <ProfileLoader sections={['basic' , 'detailed']} />
@@ -111,6 +117,7 @@ const Profile = () => {
         <>
             <div>
                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
+                    {/* Sidebar Section */}
                     <div className={`min-w-60 border shadow-md rounded-lg p-6`}>
                         <div className="flex flex-row pl-5 py-3 items-center relative">
                             <div className="flex flex-row gap-4 items-center">
@@ -198,7 +205,7 @@ const Profile = () => {
                                 </div>
                                 <div className="text-sm px-2 sm:mt-5">
                                     {isEditing ? (
-                                        <button onClick={handleSubmit} className="text-blue-500">Save Changes</button>
+                                        <button onClick={handleSave} className="text-blue-500">Save Changes</button>
                                     ) : (
                                         <p className="text-blue-500 hover:underline cursor-pointer" onClick={handleEditClick}>Change Profile Information</p>
                                     )}
@@ -212,7 +219,7 @@ const Profile = () => {
                             {/* EDITING MODE*/}
 
                             {isEditing ? (
-                                <form className="space-y-6" onSubmit={handleSubmit}>
+                                <form className="space-y-6" onSubmit={handleSave}>
                                     {/* Name Field */}
                                     <div className="flex flex-col">
                                         <label className="text-sm font-medium">First Name</label>
@@ -242,7 +249,11 @@ const Profile = () => {
                                             type="date" 
                                             name="dateOfBirth"
                                             className="border rounded-md p-2 mt-1"
-                                            value={formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString().split('T')[0] : ''}
+                                            value={
+                                                formData.dateOfBirth && !isNaN(new Date(formData.dateOfBirth).getTime()) 
+                                                    ? new Date(formData.dateOfBirth).toISOString().split('T')[0] 
+                                                    : ''
+                                            }
                                             onChange={handleChange}
                                         />
                                     </div>
@@ -273,23 +284,8 @@ const Profile = () => {
                                     </div>
 
                                     {/* Phone Number Field */}
-                                    {/* <div className="flex flex-col">
-                                        <label className="text-sm font-medium">Phone Number</label>
-                                        <div className="flex items-center border rounded-md p-2">
-                                            <img src="https://flagcdn.com/w40/jp.png" alt="Country Flag" className="w-6 h-4 mr-2" />
-                                            <input 
-                                                type="text" 
-                                                name="number"
-                                                className="flex-1"
-                                                value={formData.number} 
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div> */}
-
-
                                     <PhoneNumberInput
-                                        onChange={(completePhoneNumber) => formData.setFieldValue('number', completePhoneNumber)}
+                                        onChange={(completePhoneNumber) => setFormData((prevData) => ({ ...prevData, number: completePhoneNumber }))}
                                         defaultPhone={formData.number}
                                         defaultCountryCode={formData.countryCode}
                                     />
@@ -329,7 +325,11 @@ const Profile = () => {
                                         <input 
                                             type="date" 
                                             className="border rounded-md p-2 mt-1"
-                                            value={new Date(data.dateOfBirth).toISOString().split('T')[0]}
+                                            value={
+                                                data.dateOfBirth && !isNaN(new Date(data.dateOfBirth).getTime()) 
+                                                    ? new Date(data.dateOfBirth).toISOString().split('T')[0] 
+                                                    : ''
+                                            }
                                             readOnly
                                         />
                                     </div>
@@ -363,7 +363,7 @@ const Profile = () => {
                                     <div className="flex flex-col">
                                         <label className="text-sm font-medium">Phone Number</label>
                                         <div className="flex items-center border rounded-md p-2">
-                                            <img src="https://flagcdn.com/w40/jp.png" alt="Country Flag" className="w-6 h-4 mr-2" />
+                                            {/* <img src="https://flagcdn.com/w40/jp.png" alt="Country Flag" className="w-6 h-4 mr-2" /> */}
                                             <input 
                                                 type="text" 
                                                 className="flex-1"
@@ -371,6 +371,7 @@ const Profile = () => {
                                                 readOnly
                                             />
                                         </div>
+                                        {/* <PhoneNumberDisplay fullPhoneNumber={data.number}/> */}
                                     </div>
 
                                     {/* Email Field */}
