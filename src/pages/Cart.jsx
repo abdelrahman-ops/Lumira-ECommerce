@@ -64,7 +64,7 @@ const Cart = () => {
         setQuantities(updatedQuantities);
     };
 
-    const total = subtotal + shippingFee;
+    const total = subtotal > 0 ? subtotal + shippingFee : 0;
 
     return (
         <div className='border-t pt-14'>
@@ -102,7 +102,7 @@ const Cart = () => {
                                 className="w-4 mr-4 sm:w-5 cursor-pointer"
                                 src={assets.bin_icon}
                                 alt="Remove"
-                                onClick={() => handleRemove(item.id, item.size)} // Remove by id and size
+                                onClick={() => handleRemove(item.id, item.size)}
                             />
                         </div>
                     );
