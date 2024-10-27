@@ -1,17 +1,30 @@
 import Title from './../components/Title';
 import { useContext, useState, useEffect } from 'react';
 import { shop } from "../App";
-import { useCart } from '../customHook/CartContext';
+import { useCart } from '../hooks/CartContext';
 import { assets } from "../assets/frontend_assets/assets";
+import { useAuth } from '../hooks/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+    const { isAuthenticated } = useAuth();
     const { currency, products } = useContext(shop); 
     const { cartItems, updateTotalQuantities, removeFromCart } = useCart();
-
+    const navigate = useNavigate();
+    
     // State to manage quantities for each item
     const [quantities, setQuantities] = useState(cartItems.map(item => item.quantity));
     const [subtotal, setSubtotal] = useState(0);
     const shippingFee = 10;
+    
+
+    const handleCartClick = () =>{
+        if (isAuthenticated) {
+            navigate('/cart');
+        } else {
+            navigate('/error');
+        }
+    }
 
     useEffect(() => {
         const newSubtotal = cartItems.reduce((total, item, index) => {
@@ -125,7 +138,7 @@ const Cart = () => {
 
                     {/* Proceed to Checkout */}
                     <div className="w-full text-end">
-                        <button className="bg-black text-white text-sm my-8 px-8 py-3">PROCEED TO CHECKOUT</button>
+                        <button className="bg-black text-white text-sm my-8 px-8 py-3" onClick={handleCartClick} >PROCEED TO CHECKOUT</button>
                     </div>
                 </div>
             </div>
