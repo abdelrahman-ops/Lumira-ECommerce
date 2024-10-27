@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { shop } from "../App";
 import { assets } from "../assets/frontend_assets/assets";
 import { ToastContainer, toast } from 'react-toastify';
-import { useCart } from '../customHook/CartContext';
+import { useCart } from '../hooks/CartContext';
 
 const ProductDetail = () => {
     const [selectedSize, setSize] = useState('');
