@@ -173,7 +173,7 @@ const Profile = () => {
                                                     onClick={() => document.getElementById('imageInput').click()}
                                                 >
                                                     <img
-                                                        src={imagePreview || `http://localhost:5050${data.image}`}
+                                                        src={imagePreview || `https://server-e-commerce-seven.vercel.app${data.image}`}
                                                         alt="Profile"
                                                         className="w-full h-full rounded-full"
                                                     />
@@ -196,7 +196,7 @@ const Profile = () => {
                                             </div>
                                         </>
                                     ) : (
-                                            <img src={`http://localhost:5050${data.image}`} alt="Profile" className="w-32 h-32 rounded-full" />
+                                            <img src={`https://server-e-commerce-seven.vercel.app${data.image}`} alt="Profile" className="w-32 h-32 rounded-full" />
                                     )}
                                     <div>
                                         <p className="text-lg font-semibold">{"Name"}</p>
