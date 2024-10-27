@@ -88,7 +88,7 @@ const Profile = () => {
                 formDataToSubmit.append(key, formData[key]);
             });
     
-            const response = await axios.put('http://localhost:5050/api/users/update', formDataToSubmit, {
+            const response = await axios.put('https://server-e-commerce-seven.vercel.app/api/users/update', formDataToSubmit, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

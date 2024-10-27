@@ -76,7 +76,7 @@ const Register = () => {
                     formData.append('image', values.image);
                     
                     
-                    const response = await axios.post('http://localhost:5050/api/users/register', formData, {
+                    const response = await axios.post('https://server-e-commerce-seven.vercel.app/api/users/register', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },

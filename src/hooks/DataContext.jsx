@@ -24,7 +24,7 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://localhost:5050/api/users/profile', {
+                const response = await axios.get('https://server-e-commerce-seven.vercel.app/api/users/profile', {
                     withCredentials: true,
                 });
                 storeData(response.data.user);

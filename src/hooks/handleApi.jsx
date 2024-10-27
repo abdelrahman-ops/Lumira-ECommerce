@@ -8,7 +8,7 @@ export function useDataFetcher(url) {
 
     const getData = () => {
         axios
-            .get(`http://localhost:5050/api/${url}`, {
+            .get(`https://server-e-commerce-seven.vercel.app/api/${url}`, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get("stable")}`,
                 },
