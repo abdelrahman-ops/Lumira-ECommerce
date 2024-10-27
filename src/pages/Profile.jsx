@@ -121,7 +121,7 @@ const Profile = () => {
                     <div className={`min-w-60 border shadow-md rounded-lg p-6`}>
                         <div className="flex flex-row pl-5 py-3 items-center relative">
                             <div className="flex flex-row gap-4 items-center">
-                                <img src={`http://localhost:5050${data.image}`} alt="Profile" className="w-24 h-24 rounded-full" />
+                                <img src={`https://server-e-commerce-seven.vercel.app${data.image}`} alt="Profile" className="w-24 h-24 rounded-full" />
                                 <div className="flex flex-col text-xl items-start">
                                     <p className="text-gray-500">HELLO</p>
                                     <p className="text-gray-700 font-medium pr-3">{data.firstName}</p>
