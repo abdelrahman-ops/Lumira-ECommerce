@@ -24,15 +24,17 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('https://server-e-commerce-seven.vercel.app/api/users/profile', {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get('token')}`,
-                    },
-                    withCredentials: true,
-                });
-                storeData(response.data.user);
-                // console.log(response, "response from context");
-                
+                const token = Cookies.get('token');
+                if (token) {
+                    const response = await axios.get('https://server-e-commerce-seven.vercel.app/api/users/profile', {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        withCredentials: true,
+                    });
+                    storeData(response.data.user);
+                    // console.log(response, "response from context");
+                }
             } catch (error) {
                 console.error("Error fetching profile data:", error);
                 const storedData = localStorage.getItem('userData');
