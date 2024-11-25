@@ -35,7 +35,7 @@ const Navbar = () => {
     return (
         <div className="flex items-center justify-between py-5 m-0 font-medium">
             <a href="/">
-                <img src={assets.logo} alt="" className="w-36" />
+                <img src={assets.lumiraB} alt="" className="w-36" />
             </a>
             
             <ul className="hidden sm:flex gap-5  text-sm text-gray-700">

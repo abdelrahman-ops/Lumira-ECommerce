@@ -1,24 +1,29 @@
-import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { useAuth } from '../hooks/AuthContext';
-import { useData } from '../hooks/DataContext';
-import { assets } from "../assets/frontend_assets/assets";
-import Title from "../components/Title";
 import { useEffect, useState } from 'react';
-import axios from 'axios'; // Import axios for API calls
+import axios from 'axios';
+
+import { assets } from "../assets/frontend_assets/assets";
+
+import { useData } from '../hooks/DataContext';
 import PhoneNumberInput from '../hooks/PhoneNumberInput';
+
+import ProfileSidebar from '../components/ProfileSidebar';
+import Title from "../components/Title";
 import ProfileLoader from '../components/ProfileLoader';
+import ProfileShow from './ProfileShow';
+// import ProfileEdit from './ProfileEdit';
+
 // import PhoneNumberDisplay from '../hooks/PhoneNumberDisplay';
 
+
+
 const Profile = () => {
-    const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { data , storeData} = useData();
+    
     const [isLoading, setIsLoading] = useState(true);
-    const [show, setShow] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
 
-    
     const [formData, setFormData] = useState({
         id: '',
         firstName: '',
@@ -30,7 +35,7 @@ const Profile = () => {
         image: null,
     });
     
-    const { data , storeData} = useData();
+    
     
     useEffect(() => {
         if (data) {
@@ -52,15 +57,9 @@ const Profile = () => {
         }
     }, [data]);
     
-    const handleLogout = () => {
-        Cookies.remove('token');
-        logout();
-        navigate('/login');
-    };
+
     
-    const handleEditClick = () => {
-        setIsEditing(true);
-    };
+    const handleEditClick = () => setIsEditing(true);
     const handleChange = (event) => {
         const { name, value } = event.target;
         setFormData((prevData) => ({
@@ -113,48 +112,19 @@ const Profile = () => {
     if (isLoading) {
         return <ProfileLoader sections={['basic' , 'detailed']} />
     }
+
+
+    const defaultImage = `${assets.profile}`;
+    const userImage = data.image ? `https://server-e-commerce-seven.vercel.app${data.image}` : null;
+    const displayImage = imagePreview || userImage || defaultImage;
+
     
     return (
         <>
             <div>
                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
                     {/* Sidebar Section */}
-                    <div className={`min-w-60 border shadow-md rounded-lg p-6`}>
-                        <div className="flex flex-row pl-5 py-3 items-center relative">
-                            <div className="flex flex-row gap-4 items-center">
-                                <img src={`https://server-e-commerce-seven.vercel.app${data.image}`} alt="Profile" className="w-24 h-24 rounded-full" />
-                                <div className="flex flex-col text-xl items-start">
-                                    <p className="text-gray-500">HELLO</p>
-                                    <p className="text-gray-700 font-medium pr-3">{data.firstName}</p>
-                                </div>
-                            </div>
-                            <img
-                                src={assets.dropdown_icon}
-                                alt=""
-                                className={`h-3 sm:hidden absolute bottom-0 right-0 mx-3 my-3 ${show ? "rotate-90" : ""}`}
-                                onClick={() => setShow(!show)}
-                            />
-                        </div>
-                        <div className={`${show ? "" : "hidden"}`}>
-                            <div className="border-t border-gray-300 pl-5 py-3 bg-gray-400 cursor-pointer">
-                                <p className="mb-0 text-sm font-medium">My Account</p>
-                            </div>
-                            <div className="border-t border-gray-300 pl-5 py-3 hover:bg-gray-300 cursor-pointer">
-                                <p className="mb-0 text-sm font-medium">My Orders</p>
-                            </div>
-                            <div className="border-t border-gray-300 pl-5 py-3 hover:bg-gray-300 cursor-pointer">
-                                <p className="mb-0 text-sm font-medium">My Wish List</p>
-                            </div>
-                            <div className="border-t border-gray-300 pl-5 py-3 cursor-pointer">
-                                <button 
-                                    onClick={handleLogout} 
-                                    className="text-sm font-medium text-red-600 hover:text-red-800"
-                                >
-                                    Logout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <ProfileSidebar image={displayImage} data={data}  />
 
                     {/* Personal Information Section */}
                     <div className="flex-1">
@@ -174,7 +144,7 @@ const Profile = () => {
                                                     onClick={() => document.getElementById('imageInput').click()}
                                                 >
                                                     <img
-                                                        src={imagePreview || `https://server-e-commerce-seven.vercel.app${data.image}`}
+                                                        src={displayImage}
                                                         alt="Profile"
                                                         className="w-full h-full rounded-full"
                                                     />
@@ -197,7 +167,11 @@ const Profile = () => {
                                             </div>
                                         </>
                                     ) : (
-                                            <img src={`https://server-e-commerce-seven.vercel.app${data.image}`} alt="Profile" className="w-32 h-32 rounded-full" />
+                                            <img 
+                                                src={displayImage} 
+                                                alt="Profile" 
+                                                className="w-32 h-32 rounded-full" 
+                                            />
                                     )}
                                     <div>
                                         <p className="text-lg font-semibold">{"Name"}</p>
@@ -217,9 +191,9 @@ const Profile = () => {
 
                             {/* Form Fields */}
 
-                            {/* EDITING MODE*/}
-
-                            {isEditing ? (
+                            {isEditing ? 
+                            (
+                                // {/* EDIT MODE*/}
                                 <form className="space-y-6" onSubmit={handleSave}>
                                     {/* Name Field */}
                                     <div className="flex flex-col">
@@ -304,91 +278,11 @@ const Profile = () => {
                                         </div>
                                     </div>
                                 </form>
-                            ) : (
-
-                                // {/* NOT EDITING MODE*/}
-
-                                <form className="space-y-6">
-                                    {/* Name Field */}
-                                    <div className="flex flex-col">
-                                        <label className="text-sm font-medium">Name</label>
-                                        <input 
-                                            type="text" 
-                                            className="border rounded-md p-2 mt-1"
-                                            value={`${data.firstName} ${data.lastName}`} 
-                                            readOnly
-                                        />
-                                    </div>
-
-                                    {/* Date of Birth Field */}
-                                    <div className="flex flex-col">
-                                        <label className="text-sm font-medium">Date Of Birth</label>
-                                        <input 
-                                            type="date" 
-                                            className="border rounded-md p-2 mt-1"
-                                            value={
-                                                data.dateOfBirth && !isNaN(new Date(data.dateOfBirth).getTime()) 
-                                                    ? new Date(data.dateOfBirth).toISOString().split('T')[0] 
-                                                    : ''
-                                            }
-                                            readOnly
-                                        />
-                                    </div>
-
-                                    {/* Gender Field */}
-                                    <div className="flex items-center space-x-4">
-                                        <label className="text-sm font-medium">Gender</label>
-                                        <label className="flex items-center space-x-2">
-                                            <input
-                                                type="radio"
-                                                name="gender"
-                                                value="male"
-                                                checked={data.gender === 'male'}
-                                                readOnly
-                                            />
-                                            <span>Male</span>
-                                        </label>
-                                        <label className="flex items-center space-x-2">
-                                            <input
-                                                type="radio"
-                                                name="gender"
-                                                value="female"
-                                                checked={data.gender === 'female'}
-                                                readOnly
-                                            />
-                                            <span>Female</span>
-                                        </label>
-                                    </div>
-
-                                    {/* Phone Number Field */}
-                                    <div className="flex flex-col">
-                                        <label className="text-sm font-medium">Phone Number</label>
-                                        <div className="flex items-center border rounded-md p-2">
-                                            {/* <img src="https://flagcdn.com/w40/jp.png" alt="Country Flag" className="w-6 h-4 mr-2" /> */}
-                                            <input 
-                                                type="text" 
-                                                className="flex-1"
-                                                value={data.number} 
-                                                readOnly
-                                            />
-                                        </div>
-                                        {/* <PhoneNumberDisplay fullPhoneNumber={data.number}/> */}
-                                    </div>
-
-                                    {/* Email Field */}
-                                    <div className="flex flex-col">
-                                        <label className="text-sm font-medium">Email</label>
-                                        <div className="flex items-center border rounded-md p-2">
-                                            <i className="fas fa-envelope text-gray-500 mr-2"></i>
-                                            <input 
-                                                type="email" 
-                                                className="flex-1"
-                                                value={data.email} 
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                </form>
+                            ) : 
+                            
+                            (
+                                // {/* SHOW MODE*/}
+                                <ProfileShow data={data}/>
                             )}
                         </div>
                     </div>
