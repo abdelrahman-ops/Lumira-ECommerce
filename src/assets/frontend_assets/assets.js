@@ -73,6 +73,9 @@ import contact_img from './contact_img.png'
 import razorpay_logo from './razorpay_logo.png'
 import stripe_logo from './stripe_logo.png'
 import cross_icon from './cross_icon.png'
+import profile from './R.png'
+import lumira from './logos/lumira.jpeg';
+import lumiraB from './logos/lumiraBlue.png';
 
 export const assets = {
     logo,
@@ -92,7 +95,10 @@ export const assets = {
     contact_img,
     razorpay_logo,
     stripe_logo,
-    cross_icon
+    cross_icon,
+    profile,
+    lumira,
+    lumiraB
 }
 
 export const products = [
