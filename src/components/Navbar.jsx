@@ -3,6 +3,7 @@ import { assets } from "../assets/frontend_assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from '../hooks/AuthContext';
 import { useCart } from '../hooks/CartContext';
+import '../css/Nav.css';
 
 const Navbar = () => {
     const { totalQuantity } = useCart();

@@ -8,6 +8,7 @@ import { useLocation , useNavigate} from 'react-router-dom';
 import Cookies from "js-cookie";
 import { useAuth } from '../hooks/AuthContext';
 import { useData } from '../hooks/DataContext';
+import Title from '../components/Title';
 
 
 
@@ -139,9 +140,8 @@ const Login = () => {
     return (
         <div className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800">
             <form className="flex flex-col items-center w-full gap-4" onSubmit={formikLogin.handleSubmit}>
-                <div className="inline-flex items-center gap-2 mb-2 mt-10">
-                    <p className="prata-regular text-3xl">Login</p>
-                    <hr className="border-none h-[1.5px] w-8 bg-gray-800" />
+                <div className="inline-flex items-center gap-2 mb-2 mt-10 text-3xl prata-regular">
+                    <Title text2="Login" />
                 </div>
 
                 <input

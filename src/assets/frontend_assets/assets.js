@@ -76,6 +76,9 @@ import cross_icon from './cross_icon.png'
 import profile from './R.png'
 import lumira from './logos/lumira.jpeg';
 import lumiraB from './logos/lumiraBlue.png';
+import hero from './image.png';
+import hero2 from './hero2.png'
+import hero3 from './hero3.png'
 
 export const assets = {
     logo,
@@ -98,7 +101,11 @@ export const assets = {
     cross_icon,
     profile,
     lumira,
-    lumiraB
+    lumiraB,
+    hero,
+    hero2,
+    hero3,
+
 }
 
 export const products = [
