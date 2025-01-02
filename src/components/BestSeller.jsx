@@ -2,8 +2,8 @@ import { memo, useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductCard";
 
-const Latest = () => {
-    const [latestCollection, setLatestCollection] = useState([]);
+const BestSellers = () => {
+    const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -12,12 +12,11 @@ const Latest = () => {
             try {
                 const response = await fetch("https://server-e-commerce-seven.vercel.app/api/products");
                 const data = await response.json();
-                
+
                 if (Array.isArray(data)) {
-                    // Sort products by date and get the last 10 products
-                    const sortedProducts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    const latestProducts = sortedProducts.slice(0, 10);
-                    setLatestCollection(latestProducts);
+                    // Filter products where bestseller is true
+                    const bestSellerProducts = data.filter((product) => product.bestseller === true);
+                    setBestSellers(bestSellerProducts);
                 }
             } catch (error) {
                 console.error("Failed to fetch products:", error);
@@ -32,9 +31,9 @@ const Latest = () => {
     return (
         <div className="my-10">
             <div className="text-center py-8 text-3xl">
-                <Title text1="LATEST" text2="COLLECTION" />
+                <Title text1="BEST" text2="SELLERS" />
                 <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the.
+                    Explore our top-rated products selected by customers like you.
                 </p>
             </div>
 
@@ -42,18 +41,18 @@ const Latest = () => {
                 <div className="text-center">Loading...</div>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
-                    {latestCollection.length > 0 ? (
-                        latestCollection.map((el) => (
+                    {bestSellers.length > 0 ? (
+                        bestSellers.map((el) => (
                             <ProductItem
                                 _id={el._id}
                                 name={el.name}
                                 price={el.price}
-                                image={el.image}
+                                image={el.image[0]} // Use the first image
                                 key={el._id}
                             />
                         ))
                     ) : (
-                        <div>No products available</div>
+                        <div>No best sellers available</div>
                     )}
                 </div>
             )}
@@ -61,4 +60,4 @@ const Latest = () => {
     );
 };
 
-export default memo(Latest);
+export default memo(BestSellers);

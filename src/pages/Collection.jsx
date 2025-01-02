@@ -1,56 +1,74 @@
 import Title from "../components/Title";
 import { assets } from "../assets/frontend_assets/assets";
-import { shop } from "../App";
 import ProductItem from "../components/ProductCard";
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 const Collection = () => {
-    const { products } = useContext(shop);
-
     const [show, setShow] = useState(true);
     const [filter, setFilter] = useState([]);
     const [category, setCategory] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [products, setProducts] = useState([]);
+    const [sortBy, setSortBy] = useState("relevant");
 
-    // useEffect(() => {
-    //     if (products && products.length > 0) {
-    //         setFilter(products.slice(0, 52));
-    //     }
-    // }, [products]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/products");
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    setProducts(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     useEffect(() => {
         function applyFilter() {
-            if (products.length > 0) {
-                let productcopy = [...products];
-                if (category.length > 0) {
-                    productcopy = productcopy.filter((el) => category.includes(el.category));
-                }
-                if (subCategory.length > 0) {
-                    productcopy = productcopy.filter((el) => subCategory.includes(el.subCategory));
-                }
-                setFilter(productcopy);
+            let productcopy = [...products];
+            if (category.length > 0) {
+                productcopy = productcopy.filter((el) => category.includes(el.category));
             }
+            if (subCategory.length > 0) {
+                productcopy = productcopy.filter((el) => subCategory.includes(el.subCategory));
+            }
+
+            // Sorting logic
+            if (sortBy === "low-high") {
+                productcopy = productcopy.sort((a, b) => a.price - b.price);
+            } else if (sortBy === "high-low") {
+                productcopy = productcopy.sort((a, b) => b.price - a.price);
+            }
+
+            setFilter(productcopy);
         }
         applyFilter();
-    }, [category, subCategory, products]);
+    }, [category, subCategory, products, sortBy]);
 
-    function categoryFun(e) {
+    const categoryFun = (e) => {
         const value = e.target.value;
         if (category.includes(value)) {
-            setCategory(prev => prev.filter(el => el !== value));
+            setCategory((prev) => prev.filter((el) => el !== value));
         } else {
-            setCategory(prev => [...prev, value]);
+            setCategory((prev) => [...prev, value]);
         }
-    }
+    };
 
-    function subCategoryFun(e) {
+    const subCategoryFun = (e) => {
         const value = e.target.value;
         if (subCategory.includes(value)) {
-            setSubCategory(prev => prev.filter(el => el !== value));
+            setSubCategory((prev) => prev.filter((el) => el !== value));
         } else {
-            setSubCategory(prev => [...prev, value]);
+            setSubCategory((prev) => [...prev, value]);
         }
-    }
+    };
 
     return (
         <>
@@ -59,7 +77,8 @@ const Collection = () => {
                     <p className="my-2 text-xl flex items-center cursor-pointer gap-2">
                         FILTERS
                         <img
-                            src={assets.dropdown_icon} alt=""
+                            src={assets.dropdown_icon}
+                            alt=""
                             className={`h-3 sm:hidden ${show ? "rotate-90" : ""}`}
                             onClick={() => setShow(!show)}
                         />
@@ -72,7 +91,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Men"
-                                    onChange={(e) => categoryFun(e)}
+                                    onChange={categoryFun}
                                 /> Men
                             </p>
                             <p className="flex gap-2">
@@ -80,7 +99,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Women"
-                                    onChange={(e) => categoryFun(e)}
+                                    onChange={categoryFun}
                                 /> Women
                             </p>
                             <p className="flex gap-2">
@@ -88,7 +107,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Kids"
-                                    onChange={(e) => categoryFun(e)}
+                                    onChange={categoryFun}
                                 /> Kids
                             </p>
                         </div>
@@ -101,7 +120,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Topwear"
-                                    onChange={(e) => subCategoryFun(e)}
+                                    onChange={subCategoryFun}
                                 /> Topwear
                             </p>
                             <p className="flex gap-2">
@@ -109,7 +128,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Bottomwear"
-                                    onChange={(e) => subCategoryFun(e)}
+                                    onChange={subCategoryFun}
                                 /> Bottomwear
                             </p>
                             <p className="flex gap-2">
@@ -117,7 +136,7 @@ const Collection = () => {
                                     className="w-3"
                                     type="checkbox"
                                     value="Winterwear"
-                                    onChange={(e) => subCategoryFun(e)}
+                                    onChange={subCategoryFun}
                                 /> Winterwear
                             </p>
                         </div>
@@ -127,33 +146,40 @@ const Collection = () => {
                 <div className="flex-1">
                     <div className="flex justify-between text-base sm:text-2xl mb-4">
                         <Title text1="ALL" text2="COLLECTION" />
-                        <select className="border-2 border-gray-300 text-sm px-2" name="" id="">
+                        <select
+                            className="border-2 border-gray-300 text-sm px-2"
+                            onChange={(e) => setSortBy(e.target.value)}
+                            value={sortBy}
+                        >
                             <option value="relevant">Sort by: Relevant</option>
                             <option value="low-high">Sort by: Low to High</option>
                             <option value="high-low">Sort by: High to Low</option>
                         </select>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-                        {filter.length > 0 ? (
-                            filter.map((el) => (
-                                <ProductItem
-                                    _id={el._id}
-                                    name={el.name}
-                                    price={el.price}
-                                    image={el.image}
-                                    key={el._id}
-                                />
-                            ))
-                        ) : (
-                            <div>No products available</div>
-                        )}
-                    </div>
+
+                    {loading ? (
+                        <div className="flex justify-center items-center">Loading...</div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
+                            {filter.length > 0 ? (
+                                filter.map((el) => (
+                                    <ProductItem
+                                        _id={el._id}
+                                        name={el.name}
+                                        price={el.price}
+                                        image={el.image}
+                                        key={el._id}
+                                    />
+                                ))
+                            ) : (
+                                <div>No products available</div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </>
     );
-}
+};
 
 export default memo(Collection);
-
-

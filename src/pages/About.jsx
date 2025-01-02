@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 // import React from 'react'
 import { assets } from '../assets/frontend_assets/assets';
-import Settler from '../components/Settler';
+import Settler from '../components/Sletter';
 import Title from './../components/Title';
 
 const About = () => {

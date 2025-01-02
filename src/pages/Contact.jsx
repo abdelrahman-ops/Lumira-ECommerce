@@ -2,7 +2,7 @@
 // import Hero from './Hero';
 import { assets } from '../assets/frontend_assets/assets';
 import Title from './../components/Title';
-import Settler from './../components/Settler';
+import Settler from '../components/Sletter';
 
 const Collection = () => {
     return (
