@@ -1,19 +1,29 @@
-import { useContext } from "react";
-import { shop } from "../App";
+import { useState } from "react";
+import { useShop } from "../context/ShopContext";
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ _id, name, price, image }) => {
-    const { currency } = useContext(shop);
+    const { currency  } = useShop(); 
+    const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const [hasError, setHasError] = useState(false);
+
+    const imageUrl = image ? `https://server-e-commerce-seven.vercel.app${image}` : "/fallback-image.jpg";
 
     return (
         <Link to={`/product/${_id}`}>
             <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
                 {/* Product Image */}
                 <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
+                    {!isImageLoaded && !hasError && (
+                            <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+                    )}
                     <img
-                        src={`https://server-e-commerce-seven.vercel.app${image}`}
+                        loading="lazy"
+                        src={hasError ? "/fallback-image.jpg" : imageUrl}
                         alt={name}
-                        className="w-full h-full object-cover hover:scale-110 transition ease-in-out"
+                        className={`w-full h-full object-cover hover:scale-110 transition duration-300 ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
+                        onLoad={() => setIsImageLoaded(true)}
+                        onError={() => setHasError(true)}
                     />
                 </div>
 
