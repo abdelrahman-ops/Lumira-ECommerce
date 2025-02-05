@@ -4,7 +4,7 @@ import { useState } from "react";
 import { assets } from "../assets/frontend_assets/assets"
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/AuthContext';
+import { useAuth } from '../context/AuthContext';
 const ProfileSidebar = ({image , data}) => {
     const navigate = useNavigate();
     const [show, setShow] = useState(true);
@@ -14,7 +14,6 @@ const ProfileSidebar = ({image , data}) => {
         logout();
         navigate('/login');
     };
-    console.log(data,"sidebar");
     
     return (
         <div className={`min-w-60 border shadow-md rounded-lg p-6`}>
