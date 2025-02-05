@@ -1,46 +1,49 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { shop } from "../App";
+import { useShop } from "../context/ShopContext";  // Import Shop Context
 import { assets } from "../assets/frontend_assets/assets";
 import { ToastContainer, toast } from 'react-toastify';
-import { useCart } from '../hooks/CartContext';
+import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
     const [selectedSize, setSize] = useState('');
-    const { products, currency } = useContext(shop);
     const { id } = useParams();
+    const { products, currency, isLoading, error } = useShop();  // Get products from context
     const { addToCart } = useCart();
-
-    const handleSize = (size) => {
-        setSize(size);
-    }
-
+    const handleSize = (size) => setSize(size);
 
     const handleCart = () => {
-        if (selectedSize) {
-            addToCart({ id, size: selectedSize, quantity: 1 });
-            
-            
-            // toast.success("Item added to cart");
+        if (selectedSize && product) {
+            addToCart({
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                size: selectedSize,
+                quantity: 1
+            });
+            toast.success("Item added to cart");
         } else {
             toast.error("Choose size first");
         }
-    }
+    };
 
-    const product = products.find(prod => prod._id === id);
+    // Find product from cached data
+    const product = products?.find(prod => prod._id === id);
 
-    if (!product) return <div className="loader">Loading...</div>;
-
+    if (isLoading) return <div className="loader">Loading...</div>;
+    if (error) return <div className="error">Error loading products</div>;
+    if (!product) return <div className="error">Product not found</div>;
+    const imageUrl = product.image ? `https://server-e-commerce-seven.vercel.app${product.image}` : "/fallback-image.jpg";
     return (
         <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
             <ToastContainer />
             <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
                 <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
                     <div className="flex sm:flex-col overflow-x-auto justify-between sm:justify-normal sm:w-[18.7%] w-full">
-                        <img src={product.image} alt={product.name} className='w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer' />
+                        <img src={imageUrl} alt={product.name} className='w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer' />
                     </div>
                     <div className='w-full sm:w-[80%]'>
-                        <img src={product.image} alt={product.name} className='w-full h-auto' />
+                        <img src={imageUrl} alt={product.name} className='w-full h-auto' />
                     </div>
                 </div>
 
@@ -54,12 +57,9 @@ const ProductDetail = () => {
                         <p className="pl-2">(122)</p>
                     </div>
                     <p className="mt-5 text-3xl font-medium">
-                        {currency}
-                        {product.price}
+                        {currency}{product.price}
                     </p>
-                    <p className='mt-5 text-gray-500 md:w-4/5'>
-                        A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.
-                    </p>
+                    <p className='mt-5 text-gray-500 md:w-4/5'>{product.description}</p>
                     <div className='flex flex-col gap-4 my-8'>
                         <p>Select Size</p>
                         <div className='flex gap-2'>
