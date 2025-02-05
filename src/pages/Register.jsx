@@ -4,8 +4,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useAuth } from "../hooks/AuthContext";
-import { useData } from "../hooks/DataContext";
+import { useAuth } from "../context/AuthContext";
+import { useData } from "../context/DataContext";
 import axios from "axios";
 import PhoneNumberInput from "../hooks/PhoneNumberInput";
 import Title from '../components/Title'

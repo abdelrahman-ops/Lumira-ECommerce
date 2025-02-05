@@ -6,8 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useLocation , useNavigate} from 'react-router-dom';
 
 import Cookies from "js-cookie";
-import { useAuth } from '../hooks/AuthContext';
-import { useData } from '../hooks/DataContext';
+import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import Title from '../components/Title';
 
 

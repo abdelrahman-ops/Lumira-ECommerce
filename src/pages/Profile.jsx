@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { assets } from "../assets/frontend_assets/assets";
 
-import { useData } from '../hooks/DataContext';
+import { useData } from '../context/DataContext';
 import PhoneNumberInput from '../hooks/PhoneNumberInput';
 
 import ProfileSidebar from '../components/ProfileSidebar';

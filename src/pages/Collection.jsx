@@ -2,42 +2,33 @@ import Title from "../components/Title";
 import { assets } from "../assets/frontend_assets/assets";
 import ProductItem from "../components/ProductCard";
 import { memo, useEffect, useState } from "react";
+import { useProductsQuery } from "../hooks/useProductsQuery"; // Import the custom hook
 
 const Collection = () => {
     const [show, setShow] = useState(true);
     const [filter, setFilter] = useState([]);
     const [category, setCategory] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [products, setProducts] = useState([]);
     const [sortBy, setSortBy] = useState("relevant");
+    const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/products");
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    setProducts(data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProducts();
-    }, []);
+    const { data: products, isLoading, isError } = useProductsQuery();
 
     useEffect(() => {
         function applyFilter() {
+            if (!products) return; // Ensure products are available
+
             let productcopy = [...products];
             if (category.length > 0) {
                 productcopy = productcopy.filter((el) => category.includes(el.category));
             }
             if (subCategory.length > 0) {
                 productcopy = productcopy.filter((el) => subCategory.includes(el.subCategory));
+            }
+            if (searchTerm) {
+                productcopy = productcopy.filter((el) =>
+                    el.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
             }
 
             // Sorting logic
@@ -49,8 +40,9 @@ const Collection = () => {
 
             setFilter(productcopy);
         }
+
         applyFilter();
-    }, [category, subCategory, products, sortBy]);
+    }, [category, subCategory, products, sortBy, searchTerm]);
 
     const categoryFun = (e) => {
         const value = e.target.value;
@@ -70,8 +62,36 @@ const Collection = () => {
         }
     };
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const clearSearch = () => {
+        setSearchTerm("");
+    };
+
     return (
         <>
+            <div className="border-t border-b bg-gray-50 text-center">
+                <div className="inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2">
+                    <input
+                        className="flex-1 outline-none bg-inherit text-sm"
+                        type="text"
+                        placeholder="Search"
+                        value={searchTerm}
+                        onChange={handleSearch}
+                    />
+                    <img className="w-4" src={assets.search_icon} alt="" />
+                </div>
+                {searchTerm && (
+                    <img
+                        className="inline w-3 cursor-pointer"
+                        src={assets.cross_icon}
+                        alt=""
+                        onClick={clearSearch}
+                    />
+                )}
+            </div>
             <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
                 <div className="min-w-60">
                     <p className="my-2 text-xl flex items-center cursor-pointer gap-2">
@@ -157,8 +177,10 @@ const Collection = () => {
                         </select>
                     </div>
 
-                    {loading ? (
+                    {isLoading ? (
                         <div className="flex justify-center items-center">Loading...</div>
+                    ) : isError ? (
+                        <div className="flex justify-center items-center">Failed to load products.</div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
                             {filter.length > 0 ? (
