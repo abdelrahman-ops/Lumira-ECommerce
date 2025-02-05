@@ -6,7 +6,7 @@ import "../css/Hero.css";
 import { assets } from "../assets/frontend_assets/assets";
 
 const Hero = () => {
-    const images = [assets.hero2, assets.hero3]; // Replace with your images
+    const images = [assets.hero4 ,assets.h9 ,assets.h10 ,assets.h11]; // Replace with your images
 
     return (
         <div className="hero-container relative w-full h-[40vh] 
