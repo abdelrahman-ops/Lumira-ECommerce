@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { assets } from "../assets/frontend_assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from '../hooks/AuthContext';
-import { useCart } from '../hooks/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import '../css/Nav.css';
 
 const Navbar = () => {
@@ -61,7 +61,10 @@ const Navbar = () => {
             </ul>
 
             <div className="flex items-center gap-6">
-                <img src={assets.search_icon} alt="Search" className="w-5 cursor-pointer hover:scale-110 transition-transform duration-300" />
+                <NavLink to="/collection" aria-current="page">
+                    <img src={assets.search_icon} alt="Search" className="w-5 cursor-pointer hover:scale-110 transition-transform duration-300" />
+                </NavLink>
+                
                 
                 <div className="group relative">
                     <img
