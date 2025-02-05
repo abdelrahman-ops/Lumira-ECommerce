@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createContext } from 'react';
 import { ToastContainer } from 'react-toastify';
 
-import { AuthProvider } from './hooks/AuthContext';
-import {DataProvider} from './hooks/DataContext';
-import { CartProvider } from './hooks/CartContext';
-import { ProductProvider } from './hooks/ProductContext';
+import { AuthProvider } from './context/AuthContext';
+import {DataProvider} from './context/DataContext';
+import { CartProvider } from './context/CartContext';
+import { ProductProvider } from './context/ProductContext';
 
 import Home from './pages/Home';
 import Collection from './pages/Collection';
@@ -23,10 +23,14 @@ import Register from './pages/Register';
 import Navbar from './components/Navbar';
 import ProductDetail from './components/ProductDetail';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
-import { products } from "./assets/frontend_assets/assets";
+// import { products } from "./assets/frontend_assets/assets";
 
 import ProtectedRoute from './components/ProtectedRoute';
+import OrderForm from './pages/OrderForm';
+import { ShopProvider } from "./context/ShopContext";
+
 
 
 
@@ -39,25 +43,21 @@ export const shop = createContext();
 
 function App() {
 	
-	const currency = "$";
-	const value ={
-		products,
-		currency,
-	};
 	return (
-		<shop.Provider value={value}>
+		<ShopProvider>
 			<AuthProvider>
 				<DataProvider>
 					<CartProvider>
 						<ProductProvider>
 							<Router>
+								<ScrollToTop />
 								<Main />
 							</Router>
 						</ProductProvider>
 					</CartProvider>
 				</DataProvider>
 			</AuthProvider>
-		</shop.Provider>
+		</ShopProvider>
 	);
 };
 
@@ -77,6 +77,7 @@ const Main = () => {
 				<Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
 				<Route path='/error' element={<Error />} />
 				<Route path='/cart' element={ <Cart /> } />
+				<Route path='/place-order' element={ <OrderForm />} />
 				<Route path='/wishlist' element={<WishList />} />
 				<Route path='/product/:id' element={<ProductDetail />} />
             </Routes>
