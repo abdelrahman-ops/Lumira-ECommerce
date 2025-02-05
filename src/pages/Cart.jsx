@@ -1,14 +1,15 @@
 import Title from './../components/Title';
-import { useContext, useState, useEffect } from 'react';
-import { shop } from "../App";
-import { useCart } from '../hooks/CartContext';
+import { useState, useEffect } from 'react';
+import { useShop } from '../context/ShopContext';
+import { useCart } from '../context/CartContext';
 import { assets } from "../assets/frontend_assets/assets";
-import { useAuth } from '../hooks/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
     const { isAuthenticated } = useAuth();
-    const { currency, products } = useContext(shop); 
+    // const { currency, products } = useContext(shop);
+    const {currency ,products} = useShop();
     const { cartItems, updateTotalQuantities, removeFromCart } = useCart();
     const navigate = useNavigate();
     
@@ -20,7 +21,7 @@ const Cart = () => {
 
     const handleCartClick = () =>{
         if (isAuthenticated) {
-            navigate('/cart');
+            navigate('/place-order');
         } else {
             navigate('/error');
         }
@@ -78,11 +79,15 @@ const Cart = () => {
                 {cartItems.map((item, index) => {
                     const product = products.find(prod => prod._id === item.id);
                     if (!product) return null;
-
+                    const imageUrl = product.image ? `https://server-e-commerce-seven.vercel.app${product.image}` : "/fallback-image.jpg";
                     return (
                         <div key={item.id + item.size} className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4">
                             <div className="flex items-start gap-6">
-                                <img className="w-16 sm:w-20" src={product.image} alt={product.name} />
+                            <img 
+                                className="w-16 sm:w-20" 
+                                src={imageUrl} 
+                                alt={product.name} 
+                                />
                                 <div>
                                     <p className="text-xs sm:text-lg font-medium">{product.name}</p>
                                     <div className="flex items-center gap-5 mt-2">
