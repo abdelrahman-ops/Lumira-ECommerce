@@ -56,24 +56,30 @@
 
 
 
+import bin_icon from './manage/bin_icon.png'
+import cart_icon from './manage/cart_icon.png'
+import cross_icon from './manage/cross_icon.png'
+import dropdown_icon from './manage/dropdown_icon.png'
+import exchange_icon from './manage/exchange_icon.png'
+import menu_icon from './manage/menu_icon.png'
+import profile_icon from './manage/profile_icon.png'
+import quality_icon from './manage/quality_icon.png'
+import profile from './manage/R.png'
+import razorpay_logo from './manage/razorpay_logo.png'
+import search_icon from './manage/search_icon.png'
+import star_dull_icon from './manage/star_dull_icon.png'
+import star_icon from './manage/star_icon.png'
+import stripe_logo from './manage/stripe_logo.png'
+import support_img from './manage/support_img.png'
 
-import cart_icon from './cart_icon.png'
-import bin_icon from './bin_icon.png'
-import dropdown_icon from './dropdown_icon.png'
-import exchange_icon from './exchange_icon.png'
-import profile_icon from './profile_icon.png'
-import quality_icon from './quality_icon.png'
-import search_icon from './search_icon.png'
-import star_dull_icon from './star_dull_icon.png'
-import star_icon from './star_icon.png'
-import support_img from './support_img.png'
-import menu_icon from './menu_icon.png'
-import about_img from './about_img.png'
-import contact_img from './contact_img.png'
-import razorpay_logo from './razorpay_logo.png'
-import stripe_logo from './stripe_logo.png'
-import cross_icon from './cross_icon.png'
-import profile from './R.png'
+
+
+
+
+
+import about_img from './templates/about_img.png'
+import contact_img from './templates/contact_img.png'
+
 import lumira from './logos/lumira.jpeg';
 import lumiraB from './logos/lumiraBlue.png';
 
