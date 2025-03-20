@@ -3,7 +3,7 @@ import { Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "../css/Hero.css";
-import { assets } from "../assets/frontend_assets/assets";
+import { assets } from "../assets/assets";
 
 const Hero = () => {
     const images = [assets.hero4 ,assets.h9 ,assets.h10 ,assets.h11]; // Replace with your images

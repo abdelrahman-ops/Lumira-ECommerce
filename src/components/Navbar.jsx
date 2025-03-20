@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { assets } from "../assets/frontend_assets/assets";
+import { assets } from "../assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
