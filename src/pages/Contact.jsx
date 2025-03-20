@@ -1,6 +1,6 @@
 // import React from 'react'
 // import Hero from './Hero';
-import { assets } from '../assets/frontend_assets/assets';
+import { assets } from '../assets/assets';
 import Title from './../components/Title';
 import Settler from '../components/Sletter';
 

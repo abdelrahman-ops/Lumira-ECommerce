@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 // import React from 'react'
-import { assets } from '../assets/frontend_assets/assets';
+import { assets } from '../assets/assets';
 import Settler from '../components/Sletter';
 import Title from './../components/Title';
 
