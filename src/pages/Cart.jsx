@@ -1,15 +1,16 @@
+/* eslint-disable no-unused-vars */
 import Title from './../components/Title';
 import { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { useCart } from '../context/CartContext';
-import { assets } from "../assets/frontend_assets/assets";
+import { assets } from "../assets/assets";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
 
 const Cart = () => {
     const { isAuthenticated } = useAuth();
-    // const { currency, products } = useContext(shop);
-    const {currency ,products} = useShop();
+    const {currency, products} = useShop();
     const { cartItems, updateTotalQuantities, removeFromCart } = useCart();
     const navigate = useNavigate();
     
@@ -23,7 +24,8 @@ const Cart = () => {
         if (isAuthenticated) {
             navigate('/place-order');
         } else {
-            navigate('/error');
+            navigate('/login');
+            toast.info("You must log in to proceed to checkout");
         }
     }
 

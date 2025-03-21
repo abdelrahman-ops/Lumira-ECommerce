@@ -25,13 +25,13 @@ import ProductDetail from './components/ProductDetail';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 
-// import { products } from "./assets/frontend_assets/assets";
+// import { products } from "./assets/assets";
 
 import ProtectedRoute from './components/ProtectedRoute';
 import OrderForm from './pages/OrderForm';
 import { ShopProvider } from "./context/ShopContext";
 
-
+import ErrorBoundary from './ErrorBoundary'
 
 
 
@@ -65,23 +65,26 @@ function App() {
 const Main = () => {
 	return (
 		<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
-			<Navbar />
-			<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-			<Routes>
-				<Route path='/' element={<Home />} />
-				<Route path='/collection' element={<Collection />} />
-				<Route path='/about' element={<About />} />
-				<Route path='/contact' element={<Contact />} />
-				<Route path='/login' element={<Login />} />
-				<Route path='/register' element={<Register />} />
-				<Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
-				<Route path='/error' element={<Error />} />
-				<Route path='/cart' element={ <Cart /> } />
-				<Route path='/place-order' element={ <OrderForm />} />
-				<Route path='/wishlist' element={<WishList />} />
-				<Route path='/product/:id' element={<ProductDetail />} />
-            </Routes>
-			<Footer />
+			<ErrorBoundary>
+					<Navbar />
+				<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+				<Routes>
+					<Route path='/' element={<Home />} />
+					<Route path='/collection' element={<Collection />} />
+					<Route path='/about' element={<About />} />
+					<Route path='/contact' element={<Contact />} />
+					<Route path='/login' element={<Login />} />
+					<Route path='/register' element={<Register />} />
+					<Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+					<Route path='/error' element={<Error />} />
+					<Route path='/cart' element={ <Cart /> } />
+					<Route path='/place-order' element={ <OrderForm />} />
+					<Route path='/wishlist' element={<WishList />} />
+					<Route path='/product/:id' element={<ProductDetail />} />
+				</Routes>
+				<Footer />
+			</ErrorBoundary>
+			
 		</div>
 	);
 }
