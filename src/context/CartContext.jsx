@@ -4,69 +4,63 @@ import { createContext, useState, useContext, useEffect } from 'react';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
-    const [totalQuantity, setTotalQuantity] = useState(0);
+    // Initialize cartItems from localStorage
+    const [cartItems, setCartItems] = useState(() => {
+        const storedCart = localStorage.getItem('cartItems');
+        return storedCart ? JSON.parse(storedCart) : [];
+    });
 
+    // Calculate total quantity based on cartItems
+    const [totalQuantity, setTotalQuantity] = useState(() => {
+        return JSON.parse(localStorage.getItem('cartItems') || '[]')
+            .reduce((sum, item) => sum + item.quantity, 0);
+    });
+
+    // Function to update total quantities
     const updateTotalQuantities = (items) => {
-        setCartItems(items); // Save the updated cart items
-        const newTotal = items.reduce((sum, item) => sum + item.quantity, 0);
-        setTotalQuantity(newTotal);
+        setTotalQuantity(items.reduce((sum, item) => sum + item.quantity, 0));
     };
-    
 
-    useEffect(() => {
-        const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-        if (storedCartItems) {
-            setCartItems(storedCartItems);
-            updateTotalQuantities(storedCartItems);
-        }
-    }, []);
-
+    // Save cartItems to localStorage and update totalQuantity when cartItems change
     useEffect(() => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
-        updateTotalQuantities(cartItems); // Recalculate the total quantity
+        updateTotalQuantities(cartItems);
     }, [cartItems]);
 
-
-
-
+    // Add item to cart
     const addToCart = (newItem) => {
         if (!newItem || newItem.quantity <= 0 || !newItem.id || !newItem.size) {
             console.error('Invalid item data:', newItem);
             return;
         }
-    
-        const existingItem = cartItems.find(
-            item => item.id === newItem.id && item.size === newItem.size
-        );
-    
-        if (existingItem) {
-            setCartItems(cartItems.map(item =>
-                item.id === newItem.id && item.size === newItem.size
-                    ? { ...item, quantity: item.quantity + newItem.quantity }
-                    : item
-            ));
-        } else {
-            setCartItems([...cartItems, newItem]);
-        }
-    };
-    
 
+        setCartItems(prevCart => {
+            const existingItem = prevCart.find(item => item.id === newItem.id && item.size === newItem.size);
+
+            if (existingItem) {
+                return prevCart.map(item =>
+                    item.id === newItem.id && item.size === newItem.size
+                        ? { ...item, quantity: item.quantity + newItem.quantity }
+                        : item
+                );
+            } else {
+                return [...prevCart, newItem];
+            }
+        });
+    };
+
+    // Remove item from cart
     const removeFromCart = (itemId, itemSize) => {
         if (!itemId || !itemSize) {
             console.error('Invalid itemId or itemSize:', itemId, itemSize);
             return;
         }
-    
-        const updatedCartItems = cartItems.filter(item => !(item.id === itemId && item.size === itemSize));
-        setCartItems(updatedCartItems);
-        updateTotalQuantities(updatedCartItems); // Ensure total quantity is updated
+
+        setCartItems(prevCart => prevCart.filter(item => !(item.id === itemId && item.size === itemSize)));
     };
-    
-    
 
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart , updateTotalQuantities , totalQuantity}}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateTotalQuantities, totalQuantity }}>
             {children}
         </CartContext.Provider>
     );
