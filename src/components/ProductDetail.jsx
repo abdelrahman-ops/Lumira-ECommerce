@@ -1,8 +1,13 @@
+/* eslint-disable no-undef */
+import axios from 'axios';
+import Cookies from 'js-cookie'
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useShop } from "../context/ShopContext";  // Import Shop Context
-import { assets } from "../assets/frontend_assets/assets";
 import { ToastContainer, toast } from 'react-toastify';
+
+import { assets } from "../assets/assets";
+
+import { useShop } from "../context/ShopContext"; 
 import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
@@ -12,19 +17,68 @@ const ProductDetail = () => {
     const { addToCart } = useCart();
     const handleSize = (size) => setSize(size);
 
-    const handleCart = () => {
-        if (selectedSize && product) {
-            addToCart({
-                id: product._id,
-                name: product.name,
-                price: product.price,
-                size: selectedSize,
-                quantity: 1
-            });
-            toast.success("Item added to cart");
-        } else {
+    const handleCart = async () => {
+        if (!selectedSize) {
             toast.error("Choose size first");
+            return;
         }
+    
+        if (!product) {
+            toast.error("Product not found");
+            return;
+        }
+    
+        const token = Cookies.get('token');
+        console.log("Token:", token); // Debug token
+    
+        if (!token) {
+            toast.error("You must be logged in to add items to the cart");
+            return;
+        }
+    
+        try {
+            // Make API call to add product to cart
+            const response = await axios.post(
+                'https://server-e-commerce-seven.vercel.app/api/cart/add',
+                {
+                    productId: product._id, // Send the product ID to the backend
+                    quantity: 1,
+                    size: selectedSize,
+                    price: product.price,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+    
+            console.log("Backend Response:", response.data); // Debug backend response
+            if (response.data.success) {
+                addToCart({
+                    productId: product._id,
+                    name: product.name,
+                    price: product.price,
+                    size: selectedSize,
+                    quantity: 1,
+                });
+                toast.success("Item added to cart");
+            } else {
+                toast.error("Failed to add item to cart");
+            }
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            if (error.response) {
+                console.error("Backend Error Response:", error.response.data); // Debug backend error
+            }
+            if (error.response && error.response.status === 401) {
+                toast.error("Unauthorized: Please log in again");
+            } else {
+                toast.error("An error occurred while adding to cart");
+            }
+        }
+        
     };
 
     // Find product from cached data
@@ -33,7 +87,9 @@ const ProductDetail = () => {
     if (isLoading) return <div className="loader">Loading...</div>;
     if (error) return <div className="error">Error loading products</div>;
     if (!product) return <div className="error">Product not found</div>;
+    
     const imageUrl = product.image ? `https://server-e-commerce-seven.vercel.app${product.image}` : "/fallback-image.jpg";
+    
     return (
         <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
             <ToastContainer />
