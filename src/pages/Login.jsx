@@ -1,36 +1,38 @@
-import { useFormik} from 'formik';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
-
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useLocation , useNavigate} from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import Title from '../components/Title';
-
-
+import { useCart } from '../context/CartContext';
 
 const Login = () => {
     const { login } = useAuth();
     const { storeData } = useData();
     const navigate = useNavigate();
     const location = useLocation();
+    const { transferCart } = useCart(); // Use the transferCart function from CartContext
 
-    
-    
-    
-    const handleLoginSuccess = (token) =>{
-        Cookies.set("token", token)
+    const handleLoginSuccess = async (token) => {
+        Cookies.set("token", token);
         login(token);
         toast.success("Login successful!");
-        
+
+        // Transfer guest cart to user cart after successful login
+        try {
+            await transferCart(); // Call transferCart to merge guest cart with user cart
+        } catch (error) {
+            console.error("Error transferring guest cart:", error);
+            toast.error("Failed to transfer guest cart. Please try again.");
+        }
+
         const redirectPath = location.state?.from?.pathname || '/';
         navigate(redirectPath);
-    }
+    };
 
-    
     // SCHEMA FOR VALIDATION
     const schema = Yup.object().shape({
         email: Yup.string()
@@ -38,15 +40,8 @@ const Login = () => {
             .required("Email is required"),
         password: Yup.string()
             .min(8, "Password must be at least 8 characters long")
-            // .matches(/\d/, "Password must contain at least one number")
-            // .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-            // .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-            // .matches(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character")
             .required("Password is required"),
     });
-            
-    
-
 
     // SIGN IN FORM handling
     const formikLogin = useFormik({
@@ -54,88 +49,36 @@ const Login = () => {
             email: "",
             password: "",
         },
-        validationSchema: schema ,
-        
-        onSubmit: values => {
-            
-            // ######################
-            // # Backend Validation #
-            // ######################
-        //     fetch("https://server-e-commerce-seven.vercel.app/api/users/login", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(values),
-        //     })
-        //     .then((validationResponse) =>validationResponse.json()
-        //     .then((validationData) => {
-        //         console.log(validationData);
-        //         if (validationResponse.status === 422) {
-        //             toast.error(validationData.message || "Validation failed!");
-        //             return;
-        //         }
-        //     })
-        // )
-        // .catch(() => toast.error("An error occurred during validation!"));
-            
-            
-        
-            // ######################
-            // #  Authentication   #
-            // ######################
-            // fetch("https://pm.alexondev.net/api/login", {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify(values),
-            // })
-            // .then((res)=> res.json())
-            // .then(res => {
-            //     console.log(res);
-            //     if (res.data && res.data.user.token) {
-            //         handleLoginSuccess(res.data.user.token);
-            //         console.log("User data before storing:", res.data.user);
-            //         storeData(res.data.user);
-            //         console.log("Stored data successfully.");
+        validationSchema: schema,
+        onSubmit: async (values) => {
+            try {
+                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/users/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(values),
+                });
 
-            //     } else {
-            //         toast.error("Invalid credentials!");
-            //     }
-            // })
-            // .catch(() => toast.error("An error occurred!"));
+                const data = await response.json();
 
-
-            fetch("https://server-e-commerce-seven.vercel.app/api/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            })
-            .then((res)=> res.json())
-            .then(res => {
-                console.log(res);
-                
-                if (res.data.user && res.data.token) {
-                    handleLoginSuccess(res.data.token);
-                    // console.log("User data before storing:", res.data.user);
-                    storeData(res.data.user);
+                if (response.ok && data.data.user && data.data.token) {
+                    handleLoginSuccess(data.data.token); // Call handleLoginSuccess with the token
+                    storeData(data.data.user); // Store user data in DataContext
                     console.log("Stored data successfully.");
                 } else {
-                    toast.error("Invalid credentials!");
+                    toast.error(data.message || "Invalid credentials!");
                 }
-            })
-            .catch(() => toast.error("An error occurred!"));
+            } catch (error) {
+                console.error("Login error:", error);
+                toast.error("An error occurred during login!");
+            }
         },
     });
 
     const handleCreateAccountClick = () => {
-        navigate('/register')
+        navigate('/register');
     };
-
-    
 
     return (
         <div className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800">
@@ -153,10 +96,10 @@ const Login = () => {
                     onChange={formikLogin.handleChange}
                     onBlur={formikLogin.handleBlur}
                 />
-                    {formikLogin.touched.email && formikLogin.errors.email ? (
-                        <div className="text-red-500">{formikLogin.errors.email}</div>
-                    ) : null}
-                
+                {formikLogin.touched.email && formikLogin.errors.email ? (
+                    <div className="text-red-500">{formikLogin.errors.email}</div>
+                ) : null}
+
                 <input
                     type="password"
                     name="password"
@@ -166,9 +109,9 @@ const Login = () => {
                     onChange={formikLogin.handleChange}
                     onBlur={formikLogin.handleBlur}
                 />
-                    {formikLogin.touched.password && formikLogin.errors.password ? (
-                        <div className="text-red-500">{formikLogin.errors.password}</div>
-                    ) : null}
+                {formikLogin.touched.password && formikLogin.errors.password ? (
+                    <div className="text-red-500">{formikLogin.errors.password}</div>
+                ) : null}
 
                 <div className="w-full flex justify-between text-sm mt-[-8px]">
                     <p className="cursor-pointer">Forgot your password?</p>

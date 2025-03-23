@@ -33,7 +33,7 @@ export const addToUserCart = async (item, token) => {
 
 
 export const fetchUserCart = async (token) => {
-    const { data } = await API.get('/cart', {
+    const { data } = await API.get('/cart/get', {
         headers: { Authorization: `Bearer ${token}` },
     });
     return data;
@@ -41,8 +41,34 @@ export const fetchUserCart = async (token) => {
 
 
 // Transfer guest cart to user cart
-export const transferCartToServer = async (cartItems, token) => {
+export const transferGuestCartToUser = async (cartItems, token) => {
     const { data } = await API.post('/cart/transfer', { cartItems }, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+};
+
+// Update cart item quantity
+export const updateCartItem = async (item, token) => {
+    const { data } = await API.put('/cart/update', item, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+};
+
+// Remove item from cart
+export const removeFromUserCart = async (productId, size, token) => {
+    const { data } = await API.delete('/cart/delete-one-product', {
+        data: { productId, size },
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+};
+
+
+// Clear the entire cart
+export const clearUserCart = async (token) => {
+    const { data } = await API.delete('/cart/clear-cart', {
         headers: { Authorization: `Bearer ${token}` },
     });
     return data;

@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
-import { useCart } from "../context/CartContext"; // Import useCart instead of useShop
+import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { assets } from "../assets/assets";
 
 const ProductCard = ({ _id, name, price, image }) => {
-    const { addToCart } = useCart(); // Use useCart to access addToCart
+    const { addToCart } = useCart();
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -11,24 +14,31 @@ const ProductCard = ({ _id, name, price, image }) => {
 
     const imageUrl = image ? `https://server-e-commerce-seven.vercel.app${image}` : "/fallback-image.jpg";
 
-    const handleAddToCart = () => {
-        if (selectedSize) {
-            addToCart({
-                id: _id, // Use 'id' instead of '_id' to match your CartContext logic
+    const handleAddToCart = async () => {
+        if (!selectedSize) {
+            toast.error("Please select a size before adding to cart.");
+            return;
+        }
+
+        try {
+            await addToCart({
+                productId: _id,
                 name,
                 price,
                 image,
                 size: selectedSize,
-                quantity: 1, // Default quantity to 1
+                quantity: 1,
             });
-            setIsExpanded(false); // Collapse the card after adding to cart
-        } else {
-            alert("Please select a size before adding to cart.");
+            setIsExpanded(false);
+            toast.success(`${name} (Size: ${selectedSize}) added to cart!`);
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            toast.error("Failed to add item to cart. Please try again.");
         }
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative">
             <Link to={`/product/${_id}`}>
                 {/* Product Image */}
                 <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
@@ -56,7 +66,7 @@ const ProductCard = ({ _id, name, price, image }) => {
                     <div className="flex items-center justify-between text-sm font-medium">
                         {/* Price */}
                         <span className="text-indigo-600 text-lg font-bold">
-                            ${price} {/* Assuming currency is USD */}
+                            ${price}
                         </span>
 
                         {/* Action Buttons */}
@@ -71,7 +81,7 @@ const ProductCard = ({ _id, name, price, image }) => {
                                 title="Add to Cart"
                                 className="p-2 bg-gray-100 rounded-full hover:bg-indigo-50 text-indigo-600 transition-colors"
                                 onClick={(e) => {
-                                    e.preventDefault(); // Prevent the link from navigating
+                                    e.preventDefault();
                                     setIsExpanded(!isExpanded);
                                 }}
                             >
@@ -83,11 +93,24 @@ const ProductCard = ({ _id, name, price, image }) => {
             </Link>
 
             {/* Expanded View for Size Selection */}
-            {isExpanded && (
+            <div
+                className={`absolute bottom-0 left-0 right-0 bg-white transition-all duration-300 ease-in-out overflow-hidden ${
+                    isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                }`}
+                style={{ boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)" }}
+            >
+                {/* Close Button (x) */}
+                <button
+                    className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => setIsExpanded(false)}
+                >
+                    <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+
                 <div className="p-4 border-t border-gray-200">
                     <h4 className="text-sm font-semibold text-gray-800 mb-2">Select Size</h4>
                     <div className="flex gap-2 mb-4">
-                        {["S", "M", "L", "XL"].map((size) => (
+                        {["S", "M", "L", "XL", "XXL"].map((size) => (
                             <button
                                 key={size}
                                 className={`p-2 border rounded-full text-sm font-medium ${
@@ -108,7 +131,7 @@ const ProductCard = ({ _id, name, price, image }) => {
                         Add to Cart
                     </button>
                 </div>
-            )}
+            </div>
         </div>
     );
 };
