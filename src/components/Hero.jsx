@@ -1,24 +1,23 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade } from "swiper/modules";
+import { Autoplay, EffectFade, Parallax } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
-import "../css/Hero.css";
+import "swiper/css/parallax";
 import { assets } from "../assets/assets";
-
+import "../css/Hero.css";
 const Hero = () => {
-    const images = [assets.hero4 ,assets.h9 ,assets.h10 ,assets.h11]; // Replace with your images
+    const images = [assets.hero4, assets.h9, assets.h10, assets.h11, assets.h12, assets.h13]; // Replace with your images
 
     return (
-        <div className="hero-container relative w-full h-[40vh] 
-        md:h-[65vh] lg:h-[60vh] overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl shadow-xl
-        z-0
-        ">
+        <div 
+        className="hero-container relative w-full h-[40vh] md:h-[65vh] lg:h-[70vh] overflow-hidden rounded-xl shadow-2xl z-0">
             {/* Swiper Section */}
             <Swiper
-                modules={[Autoplay, EffectFade]}
+                modules={[Autoplay, EffectFade, Parallax]}
                 effect="fade"
                 autoplay={{ delay: 4000, disableOnInteraction: false }}
                 loop={true}
+                parallax={true}
                 className="h-full rounded-xl"
             >
                 {images.map((image, index) => (
@@ -27,20 +26,21 @@ const Hero = () => {
                             <img
                                 src={image}
                                 alt={`Slide ${index + 1}`}
-                                className="w-full h-full object-cover rounded-xl filter blur-sm md:blur-none"
+                                className="w-full h-full object-cover rounded-xl filter brightness-75 contrast-110 saturate-110 transform scale-105 hover:scale-100 transition-transform duration-5000 ease-in-out"
+                                data-swiper-parallax="-20%"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/80 rounded-xl"></div>
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80 rounded-xl"></div>
                         </div>
                     </SwiperSlide>
                 ))}
             </Swiper>
 
             {/* Text Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-xl">
-                <p className="text-xs md:text-sm text-gray-200 uppercase tracking-wide mb-4 animate-fade-in">
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-10">
+                <p className="text-xs md:text-sm text-gray-200 uppercase tracking-widest mb-4 animate-fade-in">
                     The Fashion You Deserve
                 </p>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-snug animate-slide-in drop-shadow-lg">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight animate-slide-in drop-shadow-2xl">
                     Unleash Your Style
                 </h1>
                 <p className="mt-4 text-gray-300 text-sm md:text-base lg:text-lg max-w-md md:max-w-lg mx-auto animate-fade-in">
@@ -48,7 +48,7 @@ const Hero = () => {
                 </p>
                 <a
                     href="#shop-now"
-                    className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white text-sm md:text-base uppercase rounded-full shadow-xl hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-bounce-slow"
+                    className="mt-8 px-8 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white text-sm md:text-base uppercase rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 animate-bounce-slow"
                 >
                     Shop Now
                 </a>

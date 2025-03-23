@@ -1,6 +1,8 @@
 import { memo, useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductCard";
+// import Loader from "./Loader";
+import InlineLoader from "./InlineLoader";
 
 const BestSellers = () => {
     const [bestSellers, setBestSellers] = useState([]);
@@ -38,7 +40,9 @@ const BestSellers = () => {
             </div>
 
             {loading ? (
-                <div className="text-center">Loading...</div>
+                // <div className="text-center">Loading...</div>
+                // <Loader />
+                <InlineLoader />
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
                     {bestSellers.length > 0 ? (

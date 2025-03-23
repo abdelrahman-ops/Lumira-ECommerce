@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductCard";
+import InlineLoader from "./InlineLoader";
 
 const Latest = () => {
     const [latestCollection, setLatestCollection] = useState([]);
@@ -39,7 +40,8 @@ const Latest = () => {
             </div>
 
             {loading ? (
-                <div className="text-center">Loading...</div>
+                // <div className="text-center">Loading...</div>
+                <InlineLoader />
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
                     {latestCollection.length > 0 ? (
