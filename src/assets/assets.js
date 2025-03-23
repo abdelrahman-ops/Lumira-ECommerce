@@ -79,6 +79,9 @@ import support_img from './manage/support_img.png'
 
 import about_img from './templates/about_img.png'
 import contact_img from './templates/contact_img.png'
+import contact2 from './templates/contact2.jpg'
+import about2 from './templates/about2.jpg'
+import about3 from './templates/about3.jpg'
 
 import lumira from './logos/lumira.jpeg';
 import lumiraB from './logos/lumiraBlue.png';
@@ -95,7 +98,8 @@ import h8 from './hero/h8.jpg';
 import h9 from './hero/h9.jpg';
 import h10 from './hero/h10.jpg';
 import h11 from './hero/h11.jpg';
-
+import h12 from './hero/h12.jpg';
+import h13 from './hero/h13.jpg';
 
 export const assets = {
 
@@ -118,6 +122,9 @@ export const assets = {
     menu_icon,
     about_img,
     contact_img,
+    contact2,
+    about2,
+    about3,
     razorpay_logo,
     stripe_logo,
     cross_icon,
@@ -136,7 +143,9 @@ export const assets = {
     h8,
     h9,
     h10,
-    h11
+    h11,
+    h12,
+    h13,
 
 }
 
