@@ -148,7 +148,7 @@ const Cart = () => {
         }
 
         const imageUrl = product?.image?.[0] 
-            ? `http://localhost:5000${product.image[0]}`
+            ? `https://server-e-commerce-seven.vercel.app${product.image[0]}`
             : 'https://via.placeholder.com/150';
 
         return (

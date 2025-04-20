@@ -85,7 +85,7 @@ const SearchBar = ({ onSearch, instantResults, searchTerm, setSearchTerm }) => {
                             >
                             <div className="flex items-center gap-4">
                                 <img
-                                src={`http://localhost:5000${product.image}`}
+                                src={`https://server-e-commerce-seven.vercel.app${product.image}`}
                                 alt={product.name}
                                 className="w-12 h-12 rounded-lg object-cover"
                                 />

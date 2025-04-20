@@ -112,7 +112,7 @@ const Profile = () => {
                 }
             });
 
-            const response = await axios.put('http://localhost:5000/api/users/update', formDataToSubmit, {
+            const response = await axios.put('https://server-e-commerce-seven.vercel.app/api/users/update', formDataToSubmit, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                     'Content-Type': 'multipart/form-data',
@@ -151,7 +151,7 @@ const Profile = () => {
 
 
     const defaultImage = assets.profile;
-    const userImage = user.image ? `http://localhost:5000${user.image}` : null;
+    const userImage = user.image ? `https://server-e-commerce-seven.vercel.app${user.image}` : null;
     const displayImage = imagePreview || userImage || defaultImage;
 
     return (

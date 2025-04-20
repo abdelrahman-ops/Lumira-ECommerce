@@ -45,8 +45,8 @@ interface CartResponse {
 }
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api',
-    // baseURL: 'http://localhost:5000/api',
+    // baseURL: 'https://server-e-commerce-seven.vercel.app/api',
+    baseURL: 'https://server-e-commerce-seven.vercel.app/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -146,12 +146,10 @@ export const loginUser = async (
     return data;
 };
 
-export const registerUser = async (
-    name: string,
-    email: string,
-    password: string
-    ): Promise<{ user: any; token: string }> => {
-    const { data } = await API.post('/users/register', { name, email, password });
+export const registerUser = async (formData: FormData) => {
+    const { data } = await API.post('/users/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return data;
 };
 

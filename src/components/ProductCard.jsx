@@ -29,8 +29,10 @@ const ProductCard = ({
     }, [_id]);
 
     const imageUrl = image
-        ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${image}`
+        ? `${import.meta.env.VITE_API_URL || "https://server-e-commerce-seven.vercel.app"}${image}`
         : "/fallback-image.jpg";
+
+        // https://server-e-commerce-seven.vercel.app https://server-e-commerce-seven.vercel.app
 
     const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
 

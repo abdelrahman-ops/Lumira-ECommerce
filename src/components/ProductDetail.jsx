@@ -42,7 +42,8 @@ const ProductDetail = () => {
 
     useEffect(() => {
         if (product?.image?.[0]) {
-            setMainImage(`http://localhost:5000${product.image[0]}`);
+            setMainImage(`https://server-e-commerce-seven.vercel.app${product.image[0]}`);
+            // https://server-e-commerce-seven.vercel.app https://server-e-commerce-seven.vercel.app
         }
     }, [product]);
 
@@ -94,7 +95,7 @@ const ProductDetail = () => {
     };
 
     const handleImageClick = (img, index) => {
-        setMainImage(`http://localhost:5000${img}`);
+        setMainImage(`https://server-e-commerce-seven.vercel.app${img}`);
         setCurrentImageIndex(index);
     };
 
@@ -104,7 +105,7 @@ const ProductDetail = () => {
             ? (currentImageIndex + 1) % product.image.length 
             : (currentImageIndex - 1 + product.image.length) % product.image.length;
         setCurrentImageIndex(newIndex);
-        setMainImage(`http://localhost:5000${product.image[newIndex]}`);
+        setMainImage(`https://server-e-commerce-seven.vercel.app${product.image[newIndex]}`);
     };
 
 
@@ -163,14 +164,14 @@ const ProductDetail = () => {
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.98 }}
                                 className={`w-20 h-20 sm:w-full sm:h-24 flex-shrink-0 border-2 rounded-lg transition-all
-                                    ${mainImage === `http://localhost:5000${img}` 
+                                    ${mainImage === `https://server-e-commerce-seven.vercel.app${img}` 
                                         ? 'border-orange-500 ring-2 ring-orange-200' 
                                         : 'border-gray-200 hover:border-gray-300'
                                     }
                                 `}
                             >
                                 <img 
-                                    src={`http://localhost:5000${img}`}
+                                    src={`https://server-e-commerce-seven.vercel.app${img}`}
                                     alt={`${product.name} ${index + 1}`}
                                     className='w-full h-full object-cover rounded-md'
                                 />

@@ -87,7 +87,7 @@ export const DataProvider = ({ children }) => {
   //     if (!token) return; // No token, no need to fetch
 
   //     const response = await axios.get(
-  //       "http://localhost:5000/api/users/profile",
+  //       "https://server-e-commerce-seven.vercel.app/api/users/profile",
   //       {
   //         headers: {
   //           Authorization: `Bearer ${token}`,
