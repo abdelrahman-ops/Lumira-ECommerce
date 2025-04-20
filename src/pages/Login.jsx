@@ -8,32 +8,39 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import Title from '../components/Title';
 import { useCart } from '../context/CartContext';
+import { loginUser } from '../services/api';
 
 const Login = () => {
     const { login } = useAuth();
-    const { storeData } = useData();
+    const { storeUserData } = useData();
     const navigate = useNavigate();
     const location = useLocation();
-    const { transferCart } = useCart(); // Use the transferCart function from CartContext
+    const { transferCart } = useCart();
 
-    const handleLoginSuccess = async (token) => {
-        Cookies.set("token", token);
-        login(token);
-        toast.success("Login successful!");
-
-        // Transfer guest cart to user cart after successful login
+    const handleLoginSuccess = async (token, user) => {
         try {
-            await transferCart(); // Call transferCart to merge guest cart with user cart
+            // Set token in cookies and auth context
+            Cookies.set("token", token, { expires: 7 }); // Expires in 7 days
+            login(token);
+            
+            // Store user data in context
+            storeUserData(user);
+            
+            // Transfer guest cart to user cart
+            await transferCart();
+            
+            toast.success("Login successful!");
+            
+            // Redirect to previous page or home
+            const redirectPath = location.state?.from?.pathname || '/';
+            navigate(redirectPath);
         } catch (error) {
-            console.error("Error transferring guest cart:", error);
-            toast.error("Failed to transfer guest cart. Please try again.");
+            console.error("Login success handler error:", error);
+            toast.error("An error occurred after login. Please refresh the page.");
         }
-
-        const redirectPath = location.state?.from?.pathname || '/';
-        navigate(redirectPath);
     };
 
-    // SCHEMA FOR VALIDATION
+    // Validation schema
     const schema = Yup.object().shape({
         email: Yup.string()
             .email("Invalid email format")
@@ -43,41 +50,38 @@ const Login = () => {
             .required("Password is required"),
     });
 
-    // SIGN IN FORM handling
+    // Form handling
     const formikLogin = useFormik({
         initialValues: {
             email: "",
             password: "",
         },
         validationSchema: schema,
-        onSubmit: async (values) => {
+        onSubmit: async (values, { setSubmitting }) => {
             try {
-                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/users/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(values),
-                });
+                setSubmitting(true);
+                
+                // Use the loginUser function from api.ts
+                const response = await loginUser(values.email, values.password);
 
-                const data = await response.json();
+                console.log('Login API response:', response);
 
-                if (response.ok && data.data.user && data.data.token) {
-                    handleLoginSuccess(data.data.token); // Call handleLoginSuccess with the token
-                    storeData(data.data.user); // Store user data in DataContext
-                    console.log("Stored data successfully.");
+                if (response && response.status && response.data) {
+                    await handleLoginSuccess(response.data.token, response.data.user);
                 } else {
-                    toast.error(data.message || "Invalid credentials!");
+                    throw new Error(response.message || "Invalid credentials");
                 }
             } catch (error) {
                 console.error("Login error:", error);
-                toast.error("An error occurred during login!");
+                toast.error(error.message || "Login failed. Please try again.");
+            } finally {
+                setSubmitting(false);
             }
         },
     });
 
     const handleCreateAccountClick = () => {
-        navigate('/register');
+        navigate('/register', { state: { from: location.state?.from } });
     };
 
     return (
@@ -95,10 +99,11 @@ const Login = () => {
                     value={formikLogin.values.email}
                     onChange={formikLogin.handleChange}
                     onBlur={formikLogin.handleBlur}
+                    disabled={formikLogin.isSubmitting}
                 />
-                {formikLogin.touched.email && formikLogin.errors.email ? (
+                {formikLogin.touched.email && formikLogin.errors.email && (
                     <div className="text-red-500">{formikLogin.errors.email}</div>
-                ) : null}
+                )}
 
                 <input
                     type="password"
@@ -108,19 +113,31 @@ const Login = () => {
                     value={formikLogin.values.password}
                     onChange={formikLogin.handleChange}
                     onBlur={formikLogin.handleBlur}
+                    disabled={formikLogin.isSubmitting}
                 />
-                {formikLogin.touched.password && formikLogin.errors.password ? (
+                {formikLogin.touched.password && formikLogin.errors.password && (
                     <div className="text-red-500">{formikLogin.errors.password}</div>
-                ) : null}
+                )}
 
                 <div className="w-full flex justify-between text-sm mt-[-8px]">
                     <p className="cursor-pointer">Forgot your password?</p>
-                    <button type="button" className="cursor-pointer" onClick={handleCreateAccountClick}>
+                    <button 
+                        type="button" 
+                        className="cursor-pointer" 
+                        onClick={handleCreateAccountClick}
+                        disabled={formikLogin.isSubmitting}
+                    >
                         Create account
                     </button>
                 </div>
 
-                <button className="bg-black text-white font-light px-8 py-2 mt-4" type="submit">Sign In</button>
+                <button 
+                    className="bg-black text-white font-light px-8 py-2 mt-4" 
+                    type="submit"
+                    disabled={formikLogin.isSubmitting}
+                >
+                    {formikLogin.isSubmitting ? 'Signing In...' : 'Sign In'}
+                </button>
             </form>
         </div>
     );

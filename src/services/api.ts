@@ -2,89 +2,160 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 
+interface User {
+    userId: string;
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+}
+
+
+// Type definitions
+interface CartItem {
+    productId: string;
+    size: string;
+    quantity: number;
+}
+
+interface Product {
+    _id: string;
+    name: string;
+    price: number;
+    image: string[];
+    sizes: string[];
+  // Add other product fields as needed
+}
+
+interface CartResponse {
+    success: boolean;
+    cart: {
+        _id: string;
+        user: string;
+        items: Array<{
+            product: Product;
+            size: string;
+            quantity: number;
+        }>;
+        totalQuantity: number;
+        subTotal?: number;
+        createdAt: string;
+        updatedAt: string;
+    };
+}
+
 const API = axios.create({
-    // baseURL: 'http://localhost:5050/api',
-    baseURL: 'https://server-e-commerce-seven.vercel.app/api',
+    baseURL: 'http://localhost:5000/api',
+    // baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Fetch products
-export const fetchProducts = async () => {
-    const {data} = await API.get('/products');
+// Add request interceptor for auth tokens
+API.interceptors.request.use((config) => {
+    const token = Cookies.get('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Add response interceptor for error handling
+API.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Handle token expiration
+            Cookies.remove('token');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error.response?.data?.message || 'Network error');
+    }
+);
+
+
+// Product endpoints
+export const fetchProducts = async (): Promise<Product[]> => {
+    const { data } = await API.get('/products');
     return data;
 };
 
-// Fetch single product by ID
-export const fetchProductById = async (id: string) => {
+export const fetchProductById = async (id: string): Promise<Product> => {
     const { data } = await API.get(`/products/${id}`);
     return data;
 };
 
+// Cart endpoints
+export const addToUserCart = async (item: CartItem): Promise<CartResponse> => {
+    const { data } = await API.post('/cart/add-item', item);
+    return data;
+};
 
-// Add item to the cart (user)
-export const addToUserCart = async (item, token) => {
-    const { data } = await API.post('/cart/add', item, {
-        headers: { Authorization: `Bearer ${token}` },
+export const fetchUserCart = async (): Promise<CartResponse> => {
+    const { data } = await API.get('/cart/get-cart');
+    console.log("api.ts fetch cart data: ",data);
+    return data;
+};
+
+export const updateCartItem = async (
+    productId: string,
+    size: string,
+    quantity: number
+    ): Promise<CartResponse> => {
+    const { data } = await API.put('/cart/update-item', { productId, size, quantity });
+    return data;
+};
+
+export const removeFromUserCart = async (
+    productId: string,
+    size: string
+    ): Promise<CartResponse> => {
+    const { data } = await API.delete('/cart/remove-item', {
+        data: { productId, size }
     });
     return data;
 };
 
+export const clearUserCart = async (): Promise<{ success: boolean }> => {
+    const { data } = await API.delete('/cart/clear-cart');
+    return data;
+};
 
-export const fetchUserCart = async (token) => {
-    const { data } = await API.get('/cart/get', {
-        headers: { Authorization: `Bearer ${token}` },
-    });
+export const transferGuestCartToUser = async (
+    guestItems: CartItem[]
+    ): Promise<CartResponse> => {
+    const { data } = await API.post('/cart/transfer-guest', { guestItems });
     return data;
 };
 
 
-// Transfer guest cart to user cart
-export const transferGuestCartToUser = async (cartItems, token) => {
-    const { data } = await API.post('/cart/transfer', { cartItems }, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
+// User endpoints
+export const getUser = async (): Promise<User> => {
+    const { data } = await API.get('/users/profile');
+    console.log("api.ts fetch user data: ", data);
+    return data.user;
+};
+
+// Auth endpoints
+export const loginUser = async (
+    email: string,
+    password: string
+    ): Promise<{ user: any; token: string }> => {
+    const { data } = await API.post('/users/login', { email, password });
     return data;
 };
 
-// Update cart item quantity
-export const updateCartItem = async (item, token) => {
-    const { data } = await API.put('/cart/update', item, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return data;
-};
-
-// Remove item from cart
-export const removeFromUserCart = async (productId, size, token) => {
-    const { data } = await API.delete('/cart/delete-one-product', {
-        data: { productId, size },
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return data;
-};
-
-
-// Clear the entire cart
-export const clearUserCart = async (token) => {
-    const { data } = await API.delete('/cart/clear-cart', {
-        headers: { Authorization: `Bearer ${token}` },
-    });
+export const registerUser = async (
+    name: string,
+    email: string,
+    password: string
+    ): Promise<{ user: any; token: string }> => {
+    const { data } = await API.post('/users/register', { name, email, password });
     return data;
 };
 
 
-
-// User login
-export const loginUser = async (email: string, password: string) => {
-    try {
-        const { data } = await API.post("/users/login", { email, password });
-        return data; // Contains user & token
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || "Invalid credentials");
-    }
-};
 
 
 export default API;

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Parallax } from "swiper/modules";
 import "swiper/css";
@@ -5,29 +6,66 @@ import "swiper/css/effect-fade";
 import "swiper/css/parallax";
 import { assets } from "../assets/assets";
 import "../css/Hero.css";
+import { useEffect } from "react";
+
 const Hero = () => {
-    const images = [assets.hero4, assets.h9, assets.h10, assets.h11, assets.h12, assets.h13]; // Replace with your images
+    // Preload images for better performance
+    const preloadImages = (imageUrls) => {
+        imageUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+        });
+    };
+
+    const images = [
+        { src: assets.hero4, alt: "Fashion collection 1" },
+        { src: assets.h9, alt: "Fashion collection 2" },
+        { src: assets.h11, alt: "Fashion collection 3" },
+        { src: assets.h12, alt: "Fashion collection 4" },
+        { src: assets.h13, alt: "Fashion collection 5" }
+    ];
+
+    // Preload images on component mount
+    useEffect(() => {
+        preloadImages(images.map(img => img.src));
+    }, []);
 
     return (
-        <div 
-        className="hero-container relative w-full h-[40vh] md:h-[65vh] lg:h-[70vh] overflow-hidden rounded-xl shadow-2xl z-0">
+        <div className="hero-container relative w-full h-[40vh] md:h-[65vh] lg:h-[80vh] overflow-hidden rounded-xl shadow-2xl z-0">
             {/* Swiper Section */}
             <Swiper
                 modules={[Autoplay, EffectFade, Parallax]}
                 effect="fade"
-                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                autoplay={{ 
+                    delay: 5000, 
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                    waitForTransition: true
+                }}
                 loop={true}
                 parallax={true}
-                className="h-full rounded-xl"
+                speed={1000}
+                fadeEffect={{ crossFade: true }}
+                className="h-full w-full rounded-xl"
             >
                 {images.map((image, index) => (
                     <SwiperSlide key={index}>
                         <div className="relative w-full h-full">
+                            {/* Optimized image with loading="eager" for above-the-fold content */}
                             <img
-                                src={image}
-                                alt={`Slide ${index + 1}`}
-                                className="w-full h-full object-cover rounded-xl filter brightness-75 contrast-110 saturate-110 transform scale-105 hover:scale-100 transition-transform duration-5000 ease-in-out"
-                                data-swiper-parallax="-20%"
+                                src={image.src}
+                                alt={image.alt}
+                                loading="eager"
+                                className="absolute inset-0 w-full h-full object-cover rounded-xl brightness-75 contrast-110 saturate-110"
+                                style={{
+                                    willChange: 'transform',
+                                    transform: 'scale(1.05)',
+                                    transition: 'transform 8s ease-out'
+                                }}
+                                onLoad={(e) => {
+                                    // Smooth scale animation after image loads
+                                    e.target.style.transform = 'scale(1)';
+                                }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80 rounded-xl"></div>
                         </div>
@@ -36,7 +74,7 @@ const Hero = () => {
             </Swiper>
 
             {/* Text Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-10">
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-10 px-4">
                 <p className="text-xs md:text-sm text-gray-200 uppercase tracking-widest mb-4 animate-fade-in">
                     The Fashion You Deserve
                 </p>

@@ -1,138 +1,265 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { assets } from "../assets/assets";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ShoppingCart, Star, StarHalf, Check } from "lucide-react";
 
-const ProductCard = ({ _id, name, price, image }) => {
+const ProductCard = ({
+    _id,
+    name,
+    price = 0,
+    image,
+    sizes = [],
+    discount = 0,
+    rating = 0,
+}) => {
     const { addToCart } = useCart();
-    const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [showSizes, setShowSizes] = useState(false);
     const [selectedSize, setSelectedSize] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
 
-    const imageUrl = image ? `https://server-e-commerce-seven.vercel.app${image}` : "/fallback-image.jpg";
+    useEffect(() => {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        setIsFavorite(favorites.includes(_id));
+    }, [_id]);
 
-    const handleAddToCart = async () => {
-        if (!selectedSize) {
-            toast.error("Please select a size before adding to cart.");
+    const imageUrl = image
+        ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${image}`
+        : "/fallback-image.jpg";
+
+    const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
+
+    const toggleFavorite = useCallback((e) => {
+        e.preventDefault();
+        const newStatus = !isFavorite;
+        setIsFavorite(newStatus);
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const updatedFavorites = newStatus
+            ? [...favorites, _id]
+            : favorites.filter((id) => id !== _id);
+        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+        toast.success(
+            newStatus
+                ? `${name} added to wishlist ❤️`
+                : `${name} removed from wishlist 💔`
+        );
+    }, [_id, name, isFavorite]);
+
+    const handleAddToCart = useCallback(async (e) => {
+        e?.preventDefault();
+        
+        // Validate size selection if product has sizes
+        if (sizes.length > 0 && !selectedSize) {
+            toast.error("Please select a size first");
             return;
         }
 
         try {
-            await addToCart({
-                productId: _id,
-                name,
-                price,
-                image,
-                size: selectedSize,
-                quantity: 1,
-            });
-            setIsExpanded(false);
-            toast.success(`${name} (Size: ${selectedSize}) added to cart!`);
+            const cartItem = {
+                product: {
+                    _id,
+                    name,
+                    price: discountedPrice,
+                    image,
+                },
+                size: selectedSize || 'One Size', 
+                quantity: 1
+            };
+            console.log(cartItem);
+            
+
+            await addToCart(cartItem);
+            setShowSizes(false);
+            toast.success(
+                `${name}${selectedSize ? ` (Size: ${selectedSize})` : ""} added to cart 🛒`
+            );
         } catch (error) {
-            console.error("Error adding to cart:", error);
-            toast.error("Failed to add item to cart. Please try again.");
+            console.error("Add to cart error:", error);
+            toast.error(error.message || "Failed to add item to cart. Please try again.");
         }
+    }, [_id, name, discountedPrice, imageUrl, sizes, selectedSize, addToCart]);
+
+    const formatPrice = (value) => {
+        return (value || 0).toFixed(2);
     };
 
+    // Quick add to cart handler (for products with no sizes)
+    const handleQuickAdd = useCallback((e) => {
+        e.preventDefault();
+        if (sizes.length > 0) {
+            setShowSizes(true);
+        } else {
+            handleAddToCart();
+        }
+    }, [sizes.length, handleAddToCart]);
+
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative">
-            <Link to={`/product/${_id}`}>
-                {/* Product Image */}
-                <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
-                    {!isImageLoaded && !hasError && (
-                        <div className="w-full h-full bg-gray-300 animate-pulse"></div>
-                    )}
-                    <img
-                        loading="lazy"
+        <motion.div
+            className="group bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer relative overflow-hidden"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.015 }}
+        >
+            {/* Image Section */}
+            <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+                <Link to={`/product/${_id}`} className="block h-full">
+                    <LazyLoadImage
                         src={hasError ? "/fallback-image.jpg" : imageUrl}
                         alt={name}
-                        className={`w-full h-full object-cover hover:scale-110 transition duration-300 ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
-                        onLoad={() => setIsImageLoaded(true)}
+                        effect="blur"
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                         onError={() => setHasError(true)}
                     />
-                </div>
+                </Link>
 
-                {/* Product Details */}
-                <div className="p-4 text-center">
-                    {/* Product Name */}
-                    <h3 className="text-sm font-semibold text-gray-800 truncate mb-2">
-                        {name}
-                    </h3>
-
-                    {/* Price and Actions */}
-                    <div className="flex items-center justify-between text-sm font-medium">
-                        {/* Price */}
-                        <span className="text-indigo-600 text-lg font-bold">
-                            ${price}
-                        </span>
-
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                            <button
-                                title="Add to Wishlist"
-                                className="p-2 bg-gray-100 rounded-full hover:bg-indigo-50 text-indigo-600 transition-colors"
-                            >
-                                <span className="material-symbols-outlined text-lg">favorite</span>
-                            </button>
-                            <button
-                                title="Add to Cart"
-                                className="p-2 bg-gray-100 rounded-full hover:bg-indigo-50 text-indigo-600 transition-colors"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setIsExpanded(!isExpanded);
-                                }}
-                            >
-                                <span className="material-symbols-outlined text-lg">add_shopping_cart</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </Link>
-
-            {/* Expanded View for Size Selection */}
-            <div
-                className={`absolute bottom-0 left-0 right-0 bg-white transition-all duration-300 ease-in-out overflow-hidden ${
-                    isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                }`}
-                style={{ boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)" }}
-            >
-                {/* Close Button (x) */}
-                <button
-                    className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700"
-                    onClick={() => setIsExpanded(false)}
-                >
-                    <span className="material-symbols-outlined text-lg">close</span>
-                </button>
-
-                <div className="p-4 border-t border-gray-200">
-                    <h4 className="text-sm font-semibold text-gray-800 mb-2">Select Size</h4>
-                    <div className="flex gap-2 mb-4">
-                        {["S", "M", "L", "XL", "XXL"].map((size) => (
-                            <button
-                                key={size}
-                                className={`p-2 border rounded-full text-sm font-medium ${
-                                    selectedSize === size
-                                        ? "bg-indigo-600 text-white"
-                                        : "bg-gray-100 text-gray-800"
-                                }`}
-                                onClick={() => setSelectedSize(size)}
-                            >
-                                {size}
-                            </button>
-                        ))}
-                    </div>
-                    <button
-                        className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
-                        onClick={handleAddToCart}
+                {/* Discount Tag */}
+                {discount > 0 && (
+                    <motion.div
+                        className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full z-10 shadow-md"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
                     >
-                        Add to Cart
-                    </button>
+                        {discount}% OFF
+                    </motion.div>
+                )}
+
+
+
+                {/* Action Buttons */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                    <motion.button
+                        onClick={toggleFavorite}
+                        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Heart
+                            className="w-5 h-5"
+                            fill={isFavorite ? "#f43f5e" : "none"}
+                            stroke="#f43f5e"
+                        />
+                    </motion.button>
+
+                    <motion.button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setShowSizes(!showSizes);
+                        }}
+                        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <ShoppingCart className="w-5 h-5 text-indigo-600" />
+                    </motion.button>
                 </div>
             </div>
-        </div>
+
+            {/* Info Section */}
+            <div className="p-4">
+                <Link to={`/product/${_id}`} className="block mb-1">
+                    <h3 className="text-sm font-semibold text-gray-800 hover:text-indigo-600 line-clamp-2">
+                        {name}
+                    </h3>
+                </Link>
+
+                {/* Rating */}
+                {rating > 0 && (
+                    <div className="flex items-center gap-1 mb-1">
+                        {[...Array(5)].map((_, i) => {
+                            const full = i < Math.floor(rating);
+                            const half = i === Math.floor(rating) && rating % 1 !== 0;
+                            return (
+                                <span key={i}>
+                                    {full ? (
+                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                    ) : half ? (
+                                        <StarHalf className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                    ) : (
+                                        <Star className="w-4 h-4 text-gray-300 fill-none" />
+                                    )}
+                                </span>
+                            );
+                        })}
+                        <span className="text-xs text-gray-500">({rating.toFixed(1)})</span>
+                    </div>
+                )}
+
+                {/* Price */}
+                <div className="flex items-center justify-between">
+                    {discount > 0 ? (
+                        <>
+                            <span className="text-base font-bold text-indigo-600">
+                                ${formatPrice(discountedPrice)}
+                            </span>
+                            <span className="text-xs text-gray-400 line-through">
+                                ${formatPrice(price)}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-base font-bold text-indigo-600">
+                            ${formatPrice(price)}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            {/* Size Picker */}
+            <AnimatePresence>
+                {showSizes && (
+                    <motion.div
+                        className="absolute inset-x-0 bottom-0 bg-white border-t p-4 rounded-b-2xl shadow-lg z-20"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 20, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                            Select Size
+                        </h4>
+
+                        {sizes.length > 0 ? (
+                            <div className="grid grid-cols-4 gap-2 mb-3">
+                                {sizes.map((size) => (
+                                    <motion.button
+                                        key={size}
+                                        onClick={() => setSelectedSize(size)}
+                                        className={`py-2 rounded-lg text-xs font-medium border transition-all ${
+                                            selectedSize === size
+                                                ? "bg-indigo-600 text-white border-indigo-600"
+                                                : "bg-white border-gray-300 text-gray-700 hover:border-indigo-500"
+                                        }`}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        {size}
+                                    </motion.button>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-xs text-gray-500">One Size</p>
+                        )}
+
+                        <motion.button
+                            onClick={handleAddToCart}
+                            disabled={sizes.length > 0 && !selectedSize}
+                            className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                                sizes.length > 0 && !selectedSize
+                                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            }`}
+                        >
+                            <Check className="w-4 h-4" />
+                            Add to Cart
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 

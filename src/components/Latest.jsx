@@ -2,61 +2,79 @@ import { memo, useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductCard";
 import InlineLoader from "./InlineLoader";
+import { fetchProducts } from "../services/api";
 
 const Latest = () => {
     const [latestCollection, setLatestCollection] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Fetch products from the API
-        const fetchProducts = async () => {
+        const loadLatestProducts = async () => {
             try {
-                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/products");
-                const data = await response.json();
-                
-                if (Array.isArray(data)) {
-                    // Sort products by date and get the last 10 products
-                    const sortedProducts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    const latestProducts = sortedProducts.slice(0, 10);
-                    setLatestCollection(latestProducts);
-                }
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
+                const products = await fetchProducts();
+                const sortedProducts = [...products].sort((a, b) => 
+                    new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
+                );
+                setLatestCollection(sortedProducts.slice(0, 10));
+            } catch (err) {
+                console.error("Failed to fetch products:", err);
+                setError("Failed to load latest collection");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProducts();
+        loadLatestProducts();
     }, []);
 
     return (
         <div className="my-10">
-            <div className="text-center py-8 text-3xl">
+            <div className="text-center">
                 <Title text1="LATEST" text2="COLLECTION" />
-                <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the.
+                <p className="mx-auto text-gray-600 text-sm max-w-md">
+                    Fresh arrivals just for you
                 </p>
             </div>
 
             {loading ? (
-                // <div className="text-center">Loading...</div>
-                <InlineLoader />
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
-                    {latestCollection.length > 0 ? (
-                        latestCollection.map((el) => (
+                <div className="flex justify-center mt-8">
+                    <InlineLoader />
+                </div>
+            ) : error ? (
+                <div className="text-center mt-8">
+                    <p className="text-red-500 mb-2">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="text-sm text-blue-600 hover:underline"
+                    >
+                        Try again
+                    </button>
+                </div>
+            ) : latestCollection.length > 0 ? (
+                <>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+                        {latestCollection.map((product) => (
                             <ProductItem
-                                _id={el._id}
-                                name={el.name}
-                                price={el.price}
-                                image={el.image}
-                                key={el._id}
+                                key={product._id}
+                                _id={product._id}
+                                name={product.name}
+                                price={product.price}
+                                image={product.image[0]}
+                                sizes={product.sizes}
+                                rating={product.rating}
                             />
-                        ))
-                    ) : (
-                        <div>No products available</div>
-                    )}
+                        ))}
+                    </div>
+                    <div className="text-center mt-8">
+                        <button className="text-sm text-blue-600 hover:underline">
+                            View all new arrivals →
+                        </button>
+                    </div>
+                </>
+            ) : (
+                <div className="text-center mt-8 text-gray-500">
+                    No new products available
                 </div>
             )}
         </div>

@@ -4,17 +4,20 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import '../css/Nav.css';
+import { useData } from '../context/DataContext';
 
 const Navbar = () => {
     const { totalQuantity } = useCart();
 
     const { isAuthenticated } = useAuth();
+    const { user } = useData();
+    // console.log(user);
     
     const navigate = useNavigate();
 
     const handleLoginClick = () => {
         if (isAuthenticated) {
-            navigate('/profile');
+            navigate(`/profile/${user._id}`);
         } else {
             navigate('/login', { state: { showSignUp: false } });
         }

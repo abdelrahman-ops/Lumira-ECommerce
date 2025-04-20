@@ -1,212 +1,396 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
 import Cookies from 'js-cookie';
-import { fetchUserCart, transferGuestCartToUser, removeFromUserCart, addToUserCart , updateCartItem , clearUserCart} from '../services/api';
+import { 
+    fetchUserCart, 
+    transferGuestCartToUser, 
+    removeFromUserCart, 
+    addToUserCart, 
+    updateCartItem, 
+    clearUserCart 
+} from '../services/api';
 import { toast } from 'react-toastify';
+import { debounce } from 'lodash';
+
+// Configuration
+const CART_CONFIG = {
+    maxQuantity: 100,
+    guestCartKey: 'cartItems',
+    debounceTime: 500,
+    maxPrice: 100000 // Prevent unrealistic prices
+};
+
+// Messages
+const MESSAGES = {
+    errors: {
+        add: 'Failed to add item to cart',
+        remove: 'Failed to remove item from cart',
+        update: 'Failed to update cart item',
+        clear: 'Failed to clear cart',
+        transfer: 'Failed to transfer cart',
+        load: 'Failed to load cart',
+        validation: {
+            invalidItem: 'Invalid cart item',
+            maxQuantity: `Maximum quantity per item is ${CART_CONFIG.maxQuantity}`,
+            maxPrice: `Maximum price exceeded`
+        }
+    },
+    success: {
+        add: 'Item added to cart!',
+        remove: 'Item removed from cart!',
+        update: 'Quantity updated!',
+        clear: 'Cart cleared successfully!',
+        transfer: 'Cart transferred successfully!'
+    }
+};
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    // Initialize cartItems from localStorage
-    const [cartItems, setCartItems] = useState(() => {
-        const storedCart = localStorage.getItem('cartItems');
-        try {
-            // Ensure storedCart is a valid JSON array
-            return storedCart ? JSON.parse(storedCart) : [];
-        } catch (error) {
-            console.error('Error parsing cartItems from localStorage:', error);
-            return []; // Default to an empty array if parsing fails
-        }
+    const [cartState, setCartState] = useState({
+        items: [],
+        totalQuantity: 0,
+        subtotal: 0,
+        isLoading: false,
+        isCartLoaded: false,
+        error: null
     });
-
-    // Calculate total quantity based on cartItems
-    const [totalQuantity, setTotalQuantity] = useState(() => {
-        const storedCart = localStorage.getItem('cartItems');
-        try {
-            // Ensure storedCart is a valid JSON array
-            const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-            return Array.isArray(parsedCart) ? parsedCart.reduce((sum, item) => sum + item.quantity, 0) : 0;
-        } catch (error) {
-            console.error('Error parsing cartItems for totalQuantity:', error);
-            return 0; // Default to 0 if parsing fails
-        }
-    });
-
+    
     const token = Cookies.get('token');
 
-    // Function to update total quantities
-    const updateTotalQuantities = (items) => {
-        if (!Array.isArray(items)) {
-            console.error('Expected items to be an array, received:', items);
-            return;
+    // Helper Functions
+    const getGuestCart = useCallback(() => {
+        try {
+            const storedCart = localStorage.getItem(CART_CONFIG.guestCartKey);
+            if (!storedCart) return [];
+            
+            const parsed = JSON.parse(storedCart);
+            if (!Array.isArray(parsed)) return [];
+            
+            return parsed.filter(item => 
+                item?.product?._id && 
+                item?.size && 
+                Number.isInteger(item?.quantity) && 
+                item.quantity > 0
+            );
+        } catch (error) {
+            console.error('Error parsing guest cart:', error);
+            return [];
         }
-        const newTotalQuantity = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-        setTotalQuantity(newTotalQuantity);
+    }, []);
+
+    const saveGuestCart = useCallback((items) => {
+        try {
+            localStorage.setItem(CART_CONFIG.guestCartKey, JSON.stringify(items));
+        } catch (error) {
+            console.error('Error saving guest cart:', error);
+        }
+    }, []);
+
+    const calculateTotals = useCallback((items) => {
+        const totals = items.reduce((acc, item) => {
+            const price = item.product?.price || 0;
+            const quantity = item.quantity || 0;
+            
+            return {
+                totalQuantity: acc.totalQuantity + quantity,
+                subtotal: acc.subtotal + (price * quantity)
+            };
+        }, { totalQuantity: 0, subtotal: 0 });
+        
+        return {
+            totalQuantity: totals.totalQuantity,
+            subtotal: parseFloat(totals.subtotal.toFixed(2)) // Ensure 2 decimal places
+        };
+    }, []);
+
+    const validateCartItem = (item) => {
+        if (!item || !item.product || !item.size || !item.quantity) {
+            throw new Error(MESSAGES.errors.validation.invalidItem);
+        }
+        
+        if (item.quantity <= 0 || item.quantity > CART_CONFIG.maxQuantity) {
+            throw new Error(MESSAGES.errors.validation.maxQuantity);
+        }
+        
+        if (item.product.price > CART_CONFIG.maxPrice) {
+            throw new Error(MESSAGES.errors.validation.maxPrice);
+        }
     };
 
-    // Save cartItems to localStorage and update totalQuantity when cartItems change
-    useEffect(() => {
-        localStorage.setItem('cartItems', JSON.stringify(cartItems));
-        updateTotalQuantities(cartItems); // Ensure cartItems is always an array
-    }, [cartItems]);
-
-    // Fetch user cart from the server when the user logs in
-    useEffect(() => {
-        if (token) {
-            const fetchCart = async () => {
-                try {
-                    const userCart = await fetchUserCart(token);
-                    // Ensure userCart.products is an array and use it as cartItems
-                    if (userCart && Array.isArray(userCart.products)) {
-                        setCartItems(userCart.products);
-                    } else {
-                        console.error('Invalid cart structure:', userCart);
-                        setCartItems([]); // Fallback to an empty array
-                    }
-                } catch (error) {
-                    console.error('Error fetching user cart:', error);
-                }
-            };
-            fetchCart();
-        }
-    }, [token]);
-
-    // Add item to cart (works for both guest and logged-in users)
-    const addToCart = async (newItem) => {
-        if (!newItem || newItem.quantity <= 0 || !newItem.productId || !newItem.size) {
-            console.error('Invalid item data:', newItem);
-            return;
-        }
-    
+    // Core Cart Operations
+    const loadCart = useCallback(async () => {
+        setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+        
         try {
-            if (token) {
-                // Call the API to add the item to the backend
-                await addToUserCart(newItem, token);
+            if (!token) {
+                const guestCart = getGuestCart();
+                const { totalQuantity, subtotal } = calculateTotals(guestCart);
+                
+                setCartState({
+                    items: guestCart,
+                    totalQuantity,
+                    subtotal,
+                    isLoading: false,
+                    isCartLoaded: true,
+                    error: null
+                });
+                return;
             }
-    
-            // Update the local state
-            setCartItems((prevCart) => {
-                const existingItem = prevCart.find(item => item.productId === newItem.productId && item.size === newItem.size);
-    
-                if (existingItem) {
-                    return prevCart.map(item =>
-                        item.productId === newItem.productId && item.size === newItem.size
-                            ? { ...item, quantity: item.quantity + newItem.quantity }
+
+            const { cart } = await fetchUserCart();
+            if (cart?.items) {
+                const validItems = Array.isArray(cart.items) ? cart.items : [];
+                const { totalQuantity, subtotal } = calculateTotals(validItems);
+                
+                setCartState({
+                    items: validItems,
+                    totalQuantity,
+                    subtotal,
+                    isLoading: false,
+                    isCartLoaded: true,
+                    error: null
+                });
+            }
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            setCartState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: error.message || MESSAGES.errors.load
+            }));
+            toast.error(MESSAGES.errors.load);
+        }
+    }, [token, getGuestCart, calculateTotals]);
+
+    const addToCart = async (item) => {
+        try {
+            validateCartItem(item);
+            setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+
+            const sanitizedItem = {
+                ...item,
+                quantity: Math.max(1, Math.min(CART_CONFIG.maxQuantity, item.quantity))
+            };
+
+            const cartItem = {
+                productId: item.product._id, // Most backends expect just the ID
+                size: item.size,
+                quantity: item.quantity
+            };
+
+            if (token) {
+                await addToUserCart(cartItem);
+                await loadCart();
+            } else {
+                setCartState(prev => {
+                    const existingIndex = prev.items.findIndex(
+                        i => i.product._id === sanitizedItem.product._id && 
+                             i.size === sanitizedItem.size
+                    );
+                    
+                    const updatedItems = existingIndex >= 0
+                        ? prev.items.map((item, idx) => 
+                            idx === existingIndex 
+                                ? { ...item, quantity: item.quantity + sanitizedItem.quantity }
+                                : item
+                        )
+                        : [...prev.items, sanitizedItem];
+
+                    const { totalQuantity, subtotal } = calculateTotals(updatedItems);
+                    
+                    return {
+                        ...prev,
+                        items: updatedItems,
+                        totalQuantity,
+                        subtotal,
+                        isLoading: false
+                    };
+                });
+            }
+
+            // toast.success(`${sanitizedItem.product.name} ${MESSAGES.success.add}`);
+        } catch (error) {
+            console.error('Add to cart error:', error);
+            setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
+            toast.error(error.message || MESSAGES.errors.add);
+            throw error;
+        }
+    };
+
+    const removeFromCart = async (productId, size) => {
+        try {
+            setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+            
+            if (token) {
+                await removeFromUserCart(productId, size);
+                await loadCart();
+            } else {
+                setCartState(prev => {
+                    const updatedItems = prev.items.filter(
+                        item => !(item.product._id === productId && item.size === size)
+                    );
+                    const { totalQuantity, subtotal } = calculateTotals(updatedItems);
+                    return {
+                        ...prev,
+                        items: updatedItems,
+                        totalQuantity,
+                        subtotal,
+                        isLoading: false
+                    };
+                });
+            }
+            
+            // toast.success(MESSAGES.success.remove);
+        } catch (error) {
+            console.error('Remove from cart error:', error);
+            setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
+            toast.error(MESSAGES.errors.remove);
+            throw error;
+        }
+    };
+
+    const updateCart = async (productId, size, quantity) => {
+        try {
+            if (quantity <= 0) {
+                await removeFromCart(productId, size);
+                return;
+            }
+
+            const sanitizedQuantity = Math.max(1, Math.min(CART_CONFIG.maxQuantity, quantity));
+            
+            setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+            
+            if (token) {
+                await updateCartItem(productId, size, sanitizedQuantity);
+                await loadCart();
+            } else {
+                setCartState(prev => {
+                    const updatedItems = prev.items.map(item =>
+                        item.product._id === productId && item.size === size
+                            ? { ...item, quantity: sanitizedQuantity }
                             : item
                     );
-                } else {
-                    return [...prevCart, newItem];
-                }
-            });
-    
-            toast.success(`${newItem.name} (Size: ${newItem.size}) added to cart!`);
-        } catch (error) {
-            console.error('Error adding item to cart:', error);
-            toast.error("Failed to add item to cart. Please try again.");
-        }
-    };
-
-    // Remove item from cart
-    const removeFromCart = async (productId, itemSize) => {
-        if (!productId || !itemSize) {
-            console.error('Invalid productId or itemSize:', productId, itemSize);
-            return;
-        }
-
-        try {
-            if (token) {
-                // Call the API to remove the item from the server
-                await removeFromUserCart(productId, itemSize, token);
+                    const { totalQuantity, subtotal } = calculateTotals(updatedItems);
+                    return {
+                        ...prev,
+                        items: updatedItems,
+                        totalQuantity,
+                        subtotal,
+                        isLoading: false
+                    };
+                });
             }
-
-            // Update the local state
-            setCartItems((prevCart) => prevCart.filter(item => !(item.productId === productId && item.size === itemSize)));
-            // toast.success("Item removed from cart successfully!");
+            
+            toast.success(MESSAGES.success.update);
         } catch (error) {
-            console.error('Error removing item from cart:', error);
-            toast.error("Failed to remove item from cart. Please try again.");
+            console.error('Update cart error:', error);
+            setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
+            toast.error(MESSAGES.errors.update);
+            throw error;
         }
     };
 
-    // Update item quantity in cart
-    const updateCart = async (productId, itemSize, newQuantity) => {
-        if (!productId || !itemSize || newQuantity <= 0) {
-            console.error('Invalid productId, itemSize, or quantity:', productId, itemSize, newQuantity);
-            return;
-        }
-
-        try {
-            if (token) {
-                // Call the API to update the quantity on the backend
-                await updateCartItem({ productId, size: itemSize, quantity: newQuantity }, token);
-            }
-
-            // Update the local state
-            setCartItems((prevCart) =>
-                prevCart.map(item =>
-                    item.productId === productId && item.size === itemSize
-                        ? { ...item, quantity: newQuantity }
-                        : item
-                )
-            );
-
-            toast.success("Quantity updated successfully!");
-        } catch (error) {
-            console.error('Error updating item quantity:', error);
-            toast.error("Failed to update quantity. Please try again.");
-        }
-    };
-
-    // Transfer guest cart to user cart upon login
-    const transferCart = async () => {
-        if (token) {
-            const guestCart = JSON.parse(localStorage.getItem('cartItems')) || [];
-            if (guestCart.length > 0) {
-                try {
-                    await transferGuestCartToUser(guestCart, token); // Transfer guest cart to server
-                    localStorage.removeItem('cartItems'); // Clear guest cart after transfer
-                    const userCart = await fetchUserCart(token); // Fetch updated user cart
-                    setCartItems(userCart.products); // Set cartItems to the merged cart
-                } catch (error) {
-                    console.error('Error transferring guest cart:', error);
-                }
-            }
-        }
-    };
-
-
-    // Clear the entire cart
     const clearCart = async () => {
         try {
+            setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+            
             if (token) {
-                // Call the API to clear the cart on the backend
-                await clearUserCart(token);
+                await clearUserCart();
             }
-
-            // Update the local state
-            setCartItems([]);
-            toast.success("Cart cleared successfully!");
+            
+            setCartState({
+                items: [],
+                totalQuantity: 0,
+                subtotal: 0,
+                isLoading: false,
+                isCartLoaded: true,
+                error: null
+            });
+            
+            if (!token) {
+                localStorage.removeItem(CART_CONFIG.guestCartKey);
+            }
+            
+            toast.success(MESSAGES.success.clear);
         } catch (error) {
-            console.error('Error clearing cart:', error);
-            toast.error("Failed to clear cart. Please try again.");
+            console.error('Clear cart error:', error);
+            setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
+            toast.error(MESSAGES.errors.clear);
+            throw error;
         }
     };
 
+    const transferCart = async () => {
+        if (!token) return;
+        
+        try {
+            setCartState(prev => ({ ...prev, isLoading: true, error: null }));
+            const guestCart = getGuestCart();
+            
+            if (guestCart.length > 0) {
+                await transferGuestCartToUser(guestCart);
+                localStorage.removeItem(CART_CONFIG.guestCartKey);
+                await loadCart();
+                toast.success(MESSAGES.success.transfer);
+            }
+        } catch (error) {
+            console.error('Transfer cart error:', error);
+            setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
+            toast.error(MESSAGES.errors.transfer);
+            throw error;
+        }
+    };
+
+    // Optimizations
+    const debouncedUpdateCart = useMemo(
+        () => debounce(updateCart, CART_CONFIG.debounceTime),
+        [token]
+    );
+
+    // Effects
+    useEffect(() => {
+        loadCart();
+    }, [token, loadCart]);
+
+    useEffect(() => {
+        if (!token && cartState.items.length > 0) {
+            saveGuestCart(cartState.items);
+        }
+    }, [cartState.items, token, saveGuestCart]);
+
+    useEffect(() => {
+        return () => {
+            debouncedUpdateCart.cancel();
+        };
+    }, [debouncedUpdateCart]);
+
+    // Context Value
+    const contextValue = useMemo(() => ({
+        cartItems: cartState.items,
+        totalQuantity: cartState.totalQuantity,
+        subtotal: cartState.subtotal,
+        isLoading: cartState.isLoading,
+        isCartLoaded: cartState.isCartLoaded,
+        error: cartState.error,
+        addToCart,
+        removeFromCart,
+        updateCart: debouncedUpdateCart,
+        clearCart,
+        transferCart,
+        loadCart
+    }), [cartState, debouncedUpdateCart]);
+
     return (
-        <CartContext.Provider
-            value={{
-                cartItems,
-                addToCart,
-                removeFromCart,
-                updateCart,
-                totalQuantity,
-                transferCart,
-                clearCart,
-            }}
-        >
+        <CartContext.Provider value={contextValue}>
             {children}
         </CartContext.Provider>
     );
 };
 
-// Hook to access CartContext
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+    const context = useContext(CartContext);
+    if (!context) {
+        throw new Error('useCart must be used within a CartProvider');
+    }
+    return context;
+};

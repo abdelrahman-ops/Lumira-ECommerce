@@ -1,63 +1,78 @@
 import { memo, useEffect, useState } from "react";
 import Title from "./Title";
 import ProductItem from "./ProductCard";
-// import Loader from "./Loader";
 import InlineLoader from "./InlineLoader";
+import { fetchProducts } from "../services/api";
 
 const BestSellers = () => {
     const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Fetch products from the API
-        const fetchProducts = async () => {
+        const loadBestSellers = async () => {
             try {
-                const response = await fetch("https://server-e-commerce-seven.vercel.app/api/products");
-                const data = await response.json();
-
-                if (Array.isArray(data)) {
-                    // Filter products where bestseller is true
-                    const bestSellerProducts = data.filter((product) => product.bestseller === true);
-                    setBestSellers(bestSellerProducts);
-                }
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
+                const products = await fetchProducts();
+                const bestSellerProducts = products.filter(product => product.bestseller);
+                setBestSellers(bestSellerProducts);
+            } catch (err) {
+                console.error("Failed to fetch products:", err);
+                setError("Failed to load best sellers");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProducts();
+        loadBestSellers();
     }, []);
 
     return (
         <div className="my-10">
-            <div className="text-center py-8 text-3xl">
+            <div className="text-center">
                 <Title text1="BEST" text2="SELLERS" />
-                <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-                    Explore our top-rated products selected by customers like you.
+                <p className="mx-auto text-gray-600 text-sm max-w-md">
+                    Customer favorites that never disappoint
                 </p>
             </div>
 
             {loading ? (
-                // <div className="text-center">Loading...</div>
-                // <Loader />
-                <InlineLoader />
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
-                    {bestSellers.length > 0 ? (
-                        bestSellers.map((el) => (
+                <div className="flex justify-center mt-8">
+                    <InlineLoader />
+                </div>
+            ) : error ? (
+                <div className="text-center mt-8">
+                    <p className="text-red-500 mb-2">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="text-sm text-blue-600 hover:underline"
+                    >
+                        Try again
+                    </button>
+                </div>
+            ) : bestSellers.length > 0 ? (
+                <>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+                        {bestSellers.map((product) => (
                             <ProductItem
-                                _id={el._id}
-                                name={el.name}
-                                price={el.price}
-                                image={el.image[0]} // Use the first image
-                                key={el._id}
+                                key={product._id}
+                                _id={product._id}
+                                name={product.name}
+                                price={product.price}
+                                image={product.image[0]}
+                                sizes={product.sizes}
+                                rating={product.rating}
                             />
-                        ))
-                    ) : (
-                        <div>No best sellers available</div>
-                    )}
+                        ))}
+                    </div>
+                    <div className="text-center mt-8">
+                        <button className="text-sm text-blue-600 hover:underline">
+                            View all bestsellers →
+                        </button>
+                    </div>
+                </>
+            ) : (
+                <div className="text-center mt-8 text-gray-500">
+                    Check back soon for our bestsellers
                 </div>
             )}
         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -17,19 +18,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const Profile = () => {
-    const { data, storeData } = useData();
+    const { user, error, fetchUserData, clearUserData } = useData();
+    console.log("userdata from profile", user);
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [activeSection, setActiveSection] = useState('profile');
     const navigate = useNavigate();
     const { logout } = useAuth();
+    const { id } = useParams();
 
-    const handleLogout = () => {
-        Cookies.remove('token');
-        logout();
-        navigate('/login');
-    };
 
     const [formData, setFormData] = useState({
         id: '',
@@ -44,24 +43,39 @@ const Profile = () => {
 
     // Fetch user data on component mount
     useEffect(() => {
-        if (data) {
+        if (user) {
+            setFormData({
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                number: user.number,
+                email: user.email,
+                dateOfBirth: user.dateOfBirth,
+                gender: user.gender,
+                image: user.image,
+            });
+            // Simulate loading delay for better UX
             const timer = setTimeout(() => {
                 setIsLoading(false);
             }, 1000);
-            setFormData({
-                id: data.id,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                number: data.number,
-                email: data.email,
-                dateOfBirth: data.dateOfBirth,
-                gender: data.gender,
-                image: data.image,
-            });
 
             return () => clearTimeout(timer);
+        } else {
+            // If no user data, try to fetch it
+            fetchUserData().catch(() => {
+                setIsLoading(false);
+            });
         }
-    }, [data]);
+    }, [user, fetchUserData]);
+
+    
+    // Handle logout
+    const handleLogout = () => {
+        Cookies.remove('token');
+        logout();
+        navigate('/login');
+    };
+
 
     // Handle input changes
     const handleChange = (event) => {
@@ -89,11 +103,16 @@ const Profile = () => {
         event.preventDefault();
         try {
             const formDataToSubmit = new FormData();
+
+            // Append all form data to FormData object
             Object.keys(formData).forEach(key => {
-                formDataToSubmit.append(key, formData[key]);
+                // formDataToSubmit.append(key, formData[key]);
+                if (formData[key] !== null && formData[key] !== undefined) {
+                    formDataToSubmit.append(key, formData[key]);
+                }
             });
 
-            const response = await axios.put('https://server-e-commerce-seven.vercel.app/api/users/update', formDataToSubmit, {
+            const response = await axios.put('http://localhost:5000/api/users/update', formDataToSubmit, {
                 headers: {
                     Authorization: `Bearer ${Cookies.get('token')}`,
                     'Content-Type': 'multipart/form-data',
@@ -101,8 +120,8 @@ const Profile = () => {
                 withCredentials: true,
             });
 
-            setFormData(response.data);
-            storeData(response.data);
+            setFormData(response.user);
+            storeData(response.user);
             setIsEditing(false);
 
             window.location.reload();
@@ -111,13 +130,28 @@ const Profile = () => {
         }
     };
 
-    // Show loader while data is being fetched
-    if (isLoading) {
+    const handleCancelEdit = () => {
+        // Reset form to original user data
+        setFormData({
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            number: user.number || '',
+            email: user.email || '',
+            dateOfBirth: user.dateOfBirth || '',
+            gender: user.gender || '',
+            image: user.image || null,
+        });
+        setImagePreview(null);
+        setIsEditing(false);
+    };
+
+    if (isLoading || !user) {
         return <ProfileLoader sections={['basic', 'detailed']} />;
     }
 
-    const defaultImage = `${assets.profile}`;
-    const userImage = data.image ? `https://server-e-commerce-seven.vercel.app${data.image}` : null;
+
+    const defaultImage = assets.profile;
+    const userImage = user.image ? `http://localhost:5000${user.image}` : null;
     const displayImage = imagePreview || userImage || defaultImage;
 
     return (
@@ -127,7 +161,7 @@ const Profile = () => {
                     {/* Sidebar */}
                     <ProfileSidebar
                         image={displayImage}
-                        data={data}
+                        data={user}
                         activeSection={activeSection}
                         setActiveSection={setActiveSection}
                     />
@@ -204,7 +238,7 @@ const Profile = () => {
                                         </div>
                                         <div>
                                             <p className="text-xl font-semibold">{`${formData.firstName} ${formData.lastName}`}</p>
-                                            <p className="text-sm text-gray-500">{data.email}</p>
+                                            <p className="text-sm text-gray-500">{user.email}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -309,7 +343,7 @@ const Profile = () => {
                                                 <input
                                                     type="email"
                                                     className="flex-1 outline-none bg-transparent"
-                                                    value={data.email}
+                                                    value={user.email}
                                                     readOnly
                                                 />
                                             </div>
@@ -325,7 +359,7 @@ const Profile = () => {
                                                 <input
                                                     type="text"
                                                     className="flex-1 outline-none bg-transparent"
-                                                    value={`${data.firstName} ${data.lastName}`}
+                                                    value={`${user.firstName} ${user.lastName}`}
                                                     readOnly
                                                 />
                                             </div>
@@ -340,8 +374,8 @@ const Profile = () => {
                                                     type="date"
                                                     className="flex-1 outline-none bg-transparent"
                                                     value={
-                                                        data.dateOfBirth && !isNaN(new Date(data.dateOfBirth).getTime())
-                                                            ? new Date(data.dateOfBirth).toISOString().split('T')[0]
+                                                        user.dateOfBirth && !isNaN(new Date(user.dateOfBirth).getTime())
+                                                            ? new Date(user.dateOfBirth).toISOString().split('T')[0]
                                                             : ''
                                                     }
                                                     readOnly
@@ -358,7 +392,7 @@ const Profile = () => {
                                                         type="radio"
                                                         name="gender"
                                                         value="male"
-                                                        checked={data.gender === 'male'}
+                                                        checked={user.gender === 'male'}
                                                         readOnly
                                                     />
                                                     <span>Male</span>
@@ -368,7 +402,7 @@ const Profile = () => {
                                                         type="radio"
                                                         name="gender"
                                                         value="female"
-                                                        checked={data.gender === 'female'}
+                                                        checked={user.gender === 'female'}
                                                         readOnly
                                                     />
                                                     <span>Female</span>
@@ -384,7 +418,7 @@ const Profile = () => {
                                                 <input
                                                     type="text"
                                                     className="flex-1 outline-none bg-transparent"
-                                                    value={data.number}
+                                                    value={user.number}
                                                     readOnly
                                                 />
                                             </div>
@@ -398,7 +432,7 @@ const Profile = () => {
                                                 <input
                                                     type="email"
                                                     className="flex-1 outline-none bg-transparent"
-                                                    value={data.email}
+                                                    value={user.email}
                                                     readOnly
                                                 />
                                             </div>

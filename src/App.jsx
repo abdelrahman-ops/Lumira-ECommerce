@@ -75,7 +75,7 @@ const Main = () => {
 					<Route path='/contact' element={<Contact />} />
 					<Route path='/login' element={<Login />} />
 					<Route path='/register' element={<Register />} />
-					<Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+					<Route path='/profile/:id' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
 					<Route path='/error' element={<Error />} />
 					<Route path='/cart' element={ <Cart /> } />
 					<Route path='/place-order' element={ <OrderForm />} />
