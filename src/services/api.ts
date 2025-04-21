@@ -45,7 +45,7 @@ interface CartResponse {
 }
 
 const API = axios.create({
-    // baseURL: 'https://server-e-commerce-seven.vercel.app/api',
+    // baseURL: 'http://localhost:5000/api',
     baseURL: 'https://server-e-commerce-seven.vercel.app/api',
     headers: {
         'Content-Type': 'application/json',
@@ -153,6 +153,22 @@ export const registerUser = async (formData: FormData) => {
     return data;
 };
 
+export const updateUser = async (formData: FormData) => {
+    const { data } = await API.put('/users/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return data;
+}
+
+export const deleteUser = async () => {
+    const { data } = await API.delete('/users/delete');
+    return data;
+}
+
+export const updatePassword = async (oldPassword: string, newPassword: string) => {
+    const { data } = await API.put('/users/update-password', { oldPassword, newPassword });
+    return data;
+}
 
 
 

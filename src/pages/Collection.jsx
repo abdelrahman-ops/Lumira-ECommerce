@@ -16,11 +16,11 @@ const Collection = () => {
     const [subCategory, setSubCategory] = useState([]);
     const [sortBy, setSortBy] = useState("relevant");
     const [searchTerm, setSearchTerm] = useState("");
-    // const [isTyping, setIsTyping] = useState(false);
+
 
     const { data: products, isLoading, isError } = useProductsQuery();
     const [searchParams, setSearchParams] = useSearchParams();
-    // const navigate = useNavigate();
+
 
     // Sync `category` from URL when component mounts or URL changes
     useEffect(() => {

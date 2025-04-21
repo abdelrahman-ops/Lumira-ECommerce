@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import Title from '../components/Title';
-import { useCart } from '../context/CartContext';
+// import { useCart } from '../context/CartContext';
 import { loginUser } from '../services/api';
 
 const Login = () => {
@@ -15,7 +15,7 @@ const Login = () => {
     const { storeUserData } = useData();
     const navigate = useNavigate();
     const location = useLocation();
-    const { transferCart } = useCart();
+    // const { transferCart } = useCart();
 
     const handleLoginSuccess = async (token, user) => {
         try {
@@ -27,7 +27,7 @@ const Login = () => {
             storeUserData(user);
             
             // Transfer guest cart to user cart
-            await transferCart();
+            // await transferCart();
             
             toast.success("Login successful!");
             

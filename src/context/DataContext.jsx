@@ -1,10 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
-import { getUser } from "../services/api";
+import { getUser, updateUser } from "../services/api"; // Make sure updateUser is imported
 
 const DataContext = createContext();
-
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
@@ -12,99 +11,83 @@ export const DataProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const isAuthenticated = !!Cookies.get("token");
+
     const storeUserData = (data) => {
         setUserData(data);
         localStorage.setItem("userData", JSON.stringify(data));
-    }
-
-    // Initialize from localStorage
-    useEffect(() => {
-        const loadInitialData = async () => {
-        const storedData = localStorage.getItem("userData");
-        if (storedData) {
-            setUserData(JSON.parse(storedData));
-        }
-        
-        // Optional: Immediately refresh data if token exists
-        if (Cookies.get("token")) {
-            await fetchUserData();
-        }
-        };
-        
-        loadInitialData();
-    }, []);
-
-    const fetchUserData = useCallback(async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const userData = await getUser();
-        setUserData(userData);
-        localStorage.setItem("userData", JSON.stringify(userData));
-      } catch (err) {
-        setError("Failed to fetch user data");
-        console.error("Fetch error:", err);
-        // Clear data if unauthorized
-        if (err.response?.status === 401) {
-          clearUserData();
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
-
-    const clearUserData = () => {
-      setUserData(null);
-      localStorage.removeItem("userData");
     };
 
-    // Add data synchronization
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      if (Cookies.get("token")) {
-        fetchUserData();
-      }
-    }, 300000); // Sync every 5 minutes
+    const fetchUserData = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const userData = await getUser();
+            storeUserData(userData);
+        } catch (err) {
+            setError("Failed to fetch user data");
+            console.error("Fetch error:", err);
+            if (err.response?.status === 401) {
+                logout();
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
-    return () => clearInterval(syncInterval);
-  }, [fetchUserData]);
+    const updateUserData = useCallback(async (formData) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const updatedUser = await updateUser(formData);
+            storeUserData(updatedUser);
+            return { success: true, data: updatedUser };
+        } catch (err) {
+            console.error("Update error:", err);
+            setError("Failed to update user data");
+            return { success: false, error: err };
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
-  //   const storeData = (receivedData) => {
-  //       setData(receivedData);
-  //       localStorage.setItem("userData", JSON.stringify(receivedData));
-  //   };
+    const logout = () => {
+        Cookies.remove("token");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("cartItems");
+        setUserData(null);
+    };
 
-  //   const clearData = () => {
-  //       setData(null);
-  //       localStorage.removeItem("userData");
-  //   };
+    const login = () => {
+        fetchUserData(); // Assumes token is already set
+    };
 
-  // // Function to fetch data only when needed
-  // const fetchUserData = async () => {
-  //   try {
-  //     const token = Cookies.get("token");
-  //     if (!token) return; // No token, no need to fetch
+    useEffect(() => {
+        const stored = localStorage.getItem("userData");
+        if (stored) setUserData(JSON.parse(stored));
+        if (Cookies.get("token")) fetchUserData();
+    }, [fetchUserData]);
 
-  //     const response = await axios.get(
-  //       "https://server-e-commerce-seven.vercel.app/api/users/profile",
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         withCredentials: true,
-  //       }
-  //     );
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (Cookies.get("token")) fetchUserData();
+        }, 300000);
+        return () => clearInterval(interval);
+    }, [fetchUserData]);
 
-  //     storeData(response.data.user);
-  //   } catch (error) {
-  //     console.error("Error fetching profile data:", error);
-  //   }
-  // };
-
-  return (
-    <DataContext.Provider value={{ user, isLoading, error, fetchUserData, clearUserData , storeUserData}}>
-      {children}
-    </DataContext.Provider>
-  );
+    return (
+        <DataContext.Provider value={{
+            user,
+            isLoading,
+            error,
+            isAuthenticated,
+            login,
+            logout,
+            fetchUserData,
+            storeUserData,
+            updateUserData,
+        }}>
+            {children}
+        </DataContext.Provider>
+    );
 };

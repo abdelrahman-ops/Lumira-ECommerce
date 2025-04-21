@@ -12,7 +12,7 @@ const Home = () => {
             <Latest />
             <BestSeller />
             <Sletter />
-    </div>
+        </div>
 
     );
     

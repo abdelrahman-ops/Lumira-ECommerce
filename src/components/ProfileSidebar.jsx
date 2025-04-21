@@ -7,11 +7,12 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
+
 
 const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout } = useData();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isSwiping, setIsSwiping] = useState(false);
     const [startX, setStartX] = useState(0);
