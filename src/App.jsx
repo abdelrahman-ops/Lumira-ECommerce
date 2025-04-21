@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createContext } from 'react';
 import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
 
 import { AuthProvider } from './context/AuthContext';
 import {DataProvider} from './context/DataContext';
@@ -16,7 +17,7 @@ import Login from './pages/Login';
 import Cart from './pages/Cart';
 import Profile from './pages/Profile';
 import Error from './pages/Error';
-import WishList from './pages/WishList';
+import WishList from './pages/profile/WishList';
 import Register from './pages/Register';
 
 
@@ -31,7 +32,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import OrderForm from './pages/OrderForm';
 import { ShopProvider } from "./context/ShopContext";
 
-import ErrorBoundary from './ErrorBoundary'
+import ErrorBoundary from './utils/ErrorBoundary'
 
 
 
@@ -67,6 +68,7 @@ const Main = () => {
 		<div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
 			<ErrorBoundary>
 					<Navbar />
+					<Toaster />
 				<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 				<Routes>
 					<Route path='/' element={<Home />} />
