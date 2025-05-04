@@ -1,55 +1,22 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import  {
+    Product,
+    CartItem,
+    CartResponse,
+    WishlistResponse,
+    MoveToCartResponse,
+    User,
+} from '../types/types'
+import { url } from '../components/constant/URL';
 
-
-interface User {
-    userId: string;
-    name: string;
-    email: string;
-    password: string;
-    role: string;
-}
-
-
-// Type definitions
-interface CartItem {
-    productId: string;
-    size: string;
-    quantity: number;
-}
-
-interface Product {
-    _id: string;
-    name: string;
-    price: number;
-    image: string[];
-    sizes: string[];
-  // Add other product fields as needed
-}
-
-interface CartResponse {
-    success: boolean;
-    cart: {
-        _id: string;
-        user: string;
-        items: Array<{
-            product: Product;
-            size: string;
-            quantity: number;
-        }>;
-        totalQuantity: number;
-        subTotal?: number;
-        createdAt: string;
-        updatedAt: string;
-    };
-}
 
 const API = axios.create({
-    // baseURL: 'http://localhost:5000/api',
-    baseURL: 'https://server-e-commerce-seven.vercel.app/api',
+    baseURL: `${url}/api`,
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
 // Add request interceptor for auth tokens
@@ -142,12 +109,12 @@ export const loginUser = async (
     email: string,
     password: string
     ): Promise<{ user: any; token: string }> => {
-    const { data } = await API.post('/users/login', { email, password });
+    const { data } = await API.post('/auth/login', { email, password });
     return data;
 };
 
 export const registerUser = async (formData: FormData) => {
-    const { data } = await API.post('/users/register', formData, {
+    const { data } = await API.post('/auth/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
     return data;
@@ -171,5 +138,40 @@ export const updatePassword = async (oldPassword: string, newPassword: string) =
 }
 
 
+// Wishlist endpoints
+export const fetchUserWishlist = async (): Promise<WishlistResponse> => {
+    const { data } = await API.get('/wishlist');
+    return data;
+};
+
+export const addToWishlist = async (
+    productId: string,
+    size: string
+): Promise<WishlistResponse> => {
+    const { data } = await API.post('/wishlist', { productId, size });
+    return data;
+};
+
+export const removeFromWishlist = async (
+    productId: string,
+    size: string
+): Promise<WishlistResponse> => {
+    const { data } = await API.delete(`/wishlist/${productId}/${size}`);
+    return data;
+};
+
+export const moveToCart = async (
+    productId: string,
+    size: string,
+    quantity: number = 1
+): Promise<MoveToCartResponse> => {
+    const { data } = await API.post(`/wishlist/${productId}/${size}/move-to-cart`, { quantity });
+    return data;
+};
+
+export const clearWishlist = async (): Promise<{ success: boolean }> => {
+    const { data } = await API.delete('/wishlist/clear');
+    return data;
+};
 
 export default API;
