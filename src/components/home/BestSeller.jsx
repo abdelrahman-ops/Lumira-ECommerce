@@ -37,7 +37,13 @@ const BestSellers = () => {
 
             {loading ? (
                 <div className="flex justify-center mt-8">
-                    <InlineLoader />
+                    <InlineLoader
+                        size = "xl"
+                        color="primary"
+                        showText={true}
+                        text="Loading Our Best Sellers..." 
+                        className="my-8"
+                    />
                 </div>
             ) : error ? (
                 <div className="text-center mt-8">

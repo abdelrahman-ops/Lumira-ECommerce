@@ -1,12 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useState, useCallback, useEffect } from "react";
 import { useCart } from "../../../context/CartContext";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Star, StarHalf, Check } from "lucide-react";
+import { useWishlistContext } from "../../../context/WishlistContext";
+import { url } from "../../constant/URL";
 
 const ProductCard = ({
     _id,
@@ -21,41 +24,33 @@ const ProductCard = ({
     const [hasError, setHasError] = useState(false);
     const [showSizes, setShowSizes] = useState(false);
     const [selectedSize, setSelectedSize] = useState(null);
-    const [isFavorite, setIsFavorite] = useState(false);
+    const { isInWishlist, addItem, removeItem } = useWishlistContext();
+    const isFavorite = isInWishlist(_id, 'default');
 
-    useEffect(() => {
-        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        setIsFavorite(favorites.includes(_id));
-    }, [_id]);
 
     const imageUrl = image
-        ? `${import.meta.env.VITE_API_URL || "https://server-e-commerce-seven.vercel.app"}${image}`
+        ? `${url}${image}`
         : "/fallback-image.jpg";
-
-        // https://server-e-commerce-seven.vercel.app https://server-e-commerce-seven.vercel.app
 
     const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
 
     const toggleFavorite = useCallback((e) => {
         e.preventDefault();
-        const newStatus = !isFavorite;
-        setIsFavorite(newStatus);
-        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        const updatedFavorites = newStatus
-            ? [...favorites, _id]
-            : favorites.filter((id) => id !== _id);
-        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-        toast.success(
-            newStatus
-                ? `${name} added to wishlist ❤️`
-                : `${name} removed from wishlist 💔`
-        );
-    }, [_id, name, isFavorite]);
+        if (isFavorite) {
+            removeItem(_id, 'default', name);
+        } else {
+            addItem({
+                _id,
+                name,
+                price: price,
+                image: image
+            }, 'default');
+        }
+    }, [_id, name, isFavorite, addItem, removeItem]);
 
     const handleAddToCart = useCallback(async (e) => {
         e?.preventDefault();
         
-        // Validate size selection if product has sizes
         if (sizes.length > 0 && !selectedSize) {
             toast.error("Please select a size first");
             return;
@@ -90,7 +85,6 @@ const ProductCard = ({
         return (value || 0).toFixed(2);
     };
 
-    // Quick add to cart handler (for products with no sizes)
     const handleQuickAdd = useCallback((e) => {
         e.preventDefault();
         if (sizes.length > 0) {

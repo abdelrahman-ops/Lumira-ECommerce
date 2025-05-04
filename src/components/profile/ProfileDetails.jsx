@@ -1,41 +1,85 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCalendar, faPhone, faEnvelope, faCamera } from '@fortawesome/free-solid-svg-icons';
 import PhoneNumberInput from '../../hooks/PhoneNumberInput';
 import toast from 'react-hot-toast';
+import { useData } from '../../context/DataContext';
+import { url } from '../constant/URL';
 
-const ProfileDetails = ({
-    user,
-    isEditing,
-    setIsEditing,
-    formData,
-    setFormData,
-    handleChange,
-    handleImageChange,
-    displayImage,
-    handleSave
-}) => {
+const ProfileDetails = () => {
+    const { user, imagePreview, setImagePreview } = useOutletContext(); // Fixed: Added parentheses
+    const { updateUserData , setUserData } = useData();
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({ ...user });
     const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const formatDate = (date) => {
         if (!date || isNaN(new Date(date).getTime())) return '';
         return new Date(date).toISOString().split('T')[0];
     };
 
-    const onSave = async (e) => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.match('image.*')) {
+            setErrorMsg('Please select a valid image file.');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            setErrorMsg('Image must be less than 2MB');
+            return;
+        }
+
+        setFormData(prev => ({ ...prev, image: file }));
+        setImagePreview(URL.createObjectURL(file));
+        setErrorMsg('');
+    };
+
+    const handleSave = async (e) => {
         e.preventDefault();
+        setErrorMsg('');
         setLoading(true);
+    
         try {
-            await handleSave(e);
-            toast.success('Profile updated successfully!');
-            setIsEditing(false);
-        } catch (error) {
-            console.error(error);
+            const submission = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (key !== 'image' && value !== null && value !== undefined) {
+                    submission.append(key, value);
+                }
+            });
+    
+            if (formData.image instanceof File) {
+                submission.append('image', formData.image);
+            }
+    
+            const response = await updateUserData(submission);
+            if (response.success) {
+                toast.success('Profile updated successfully!');
+                setUserData(prev => ({ ...prev, ...formData }));
+                setIsEditing(false);
+            } else {
+                setErrorMsg(response.error || 'Profile update failed. Please try again.');
+                toast.error('Failed to update profile.');
+            }
+        } catch (err) {
+            console.error(err);
+            setErrorMsg('Unexpected error occurred. Please try again.');
             toast.error('Failed to update profile.');
         } finally {
             setLoading(false);
         }
     };
+
+    // Calculate displayImage
+    const displayImage = imagePreview || (user?.image && `${url}${user.image}`) || '/default-avatar.png';
 
     return (
         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl transition-all duration-300">
@@ -53,7 +97,7 @@ const ProfileDetails = ({
                                 Cancel
                             </button>
                             <button
-                                onClick={onSave}
+                                onClick={handleSave}  // Changed from onSave to handleSave
                                 disabled={loading}
                                 className="bg-indigo-600 text-white px-6 py-2 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50"
                             >
@@ -75,7 +119,7 @@ const ProfileDetails = ({
             <div className="flex items-center mb-8 space-x-6">
                 <div className="relative group w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-md">
                     <img
-                        src={displayImage || '/default-avatar.png'}
+                        src={displayImage}
                         alt="User avatar"
                         className="w-full h-full object-cover"
                     />
@@ -105,7 +149,7 @@ const ProfileDetails = ({
 
             {/* Form Section */}
             {isEditing ? (
-                <form className="space-y-6" onSubmit={onSave}>
+                <form className="space-y-6" onSubmit={handleSave}>  {/* Changed from onSave to handleSave */}
                     {/* Name Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {['firstName', 'lastName'].map((field) => (

@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -19,14 +18,16 @@ import InlineLoader from '../../utility/InlineLoader';
 import ProductTabs from './ProductTabs';
 import RelatedProducts from './RelatedProducts';
 import { renderStars } from '../../../utils/renderStars';
-
+import { useWishlistContext } from '../../../context/WishlistContext';
+import { toast } from "react-hot-toast";
+import {url} from '../../constant/URL'
 const ProductDetail = () => {
     const [selectedSize, setSelectedSize] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
     const [mainImage, setMainImage] = useState('');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [wishlisted, setWishlisted] = useState(false);
+    const { isInWishlist, addItem, removeItem , loading: wishlistLoading } = useWishlistContext();
     const [showComingSoon, setShowComingSoon] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
@@ -38,12 +39,14 @@ const ProductDetail = () => {
 
     const reviewCount = product?.reviewCount || 122;
     
-    
+    const isWishlisted = product 
+  ? isInWishlist(product._id, 'default') 
+  : false;
+
 
     useEffect(() => {
         if (product?.image?.[0]) {
-            setMainImage(`https://server-e-commerce-seven.vercel.app${product.image[0]}`);
-            // https://server-e-commerce-seven.vercel.app https://server-e-commerce-seven.vercel.app
+            setMainImage(`${url}${product.image[0]}`);
         }
     }, [product]);
 
@@ -95,7 +98,7 @@ const ProductDetail = () => {
     };
 
     const handleImageClick = (img, index) => {
-        setMainImage(`https://server-e-commerce-seven.vercel.app${img}`);
+        setMainImage(`${url}${img}`);
         setCurrentImageIndex(index);
     };
 
@@ -105,14 +108,33 @@ const ProductDetail = () => {
             ? (currentImageIndex + 1) % product.image.length 
             : (currentImageIndex - 1 + product.image.length) % product.image.length;
         setCurrentImageIndex(newIndex);
-        setMainImage(`https://server-e-commerce-seven.vercel.app${product.image[newIndex]}`);
+        setMainImage(`${url}${product.image[newIndex]}`);
     };
 
 
-    const toggleWishlist = () => {
-        setWishlisted(!wishlisted);
-        toast.success(!wishlisted ? "Added to wishlist" : "Removed from wishlist");
-    };
+    const toggleWishlist = async () => {
+        console.log('Current wishlist status:', isWishlisted); // Debug
+        try {
+          if (isWishlisted) {
+            console.log('Removing from wishlist...'); // Debug
+            await removeItem(product._id, 'default', product.name);
+            // toast.success(`${product.name} removed from wishlist 💔`);
+          } else {
+            console.log('Adding to wishlist...'); // Debug
+            await addItem({
+              _id: product._id,
+              name: product.name,
+              price: product.price,
+              image: product.image
+            }, 'default');
+            // toast.success(`${product.name} added to wishlist ❤️`);
+          }
+          console.log('Wishlist operation completed'); // Debug
+        } catch (error) {
+          console.error("Wishlist error:", error); // Debug
+          toast.error(error.message || "Failed to update wishlist");
+        }
+      };
 
     const shareProduct = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -139,8 +161,6 @@ const ProductDetail = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-            <ToastContainer position="bottom-right" autoClose={3000} />
-            
             {/* Breadcrumbs */}
             <div className="flex items-center text-sm text-gray-500 mb-6">
                 <span className="hover:text-black cursor-pointer" onClick={() => navigate('/')}>Home</span>
@@ -164,14 +184,14 @@ const ProductDetail = () => {
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.98 }}
                                 className={`w-20 h-20 sm:w-full sm:h-24 flex-shrink-0 border-2 rounded-lg transition-all
-                                    ${mainImage === `https://server-e-commerce-seven.vercel.app${img}` 
+                                    ${mainImage === `${url}${img}` 
                                         ? 'border-orange-500 ring-2 ring-orange-200' 
                                         : 'border-gray-200 hover:border-gray-300'
                                     }
                                 `}
                             >
                                 <img 
-                                    src={`https://server-e-commerce-seven.vercel.app${img}`}
+                                    src={`${url}${img}`}
                                     alt={`${product.name} ${index + 1}`}
                                     className='w-full h-full object-cover rounded-md'
                                 />
@@ -208,14 +228,20 @@ const ProductDetail = () => {
                                 </>
                             )}
                             <div className="absolute top-3 right-3 flex gap-2">
-                                <button 
-                                    onClick={toggleWishlist}
-                                    className="p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-colors"
+                            <button 
+                                onClick={toggleWishlist}
+                                disabled={wishlistLoading}
+                                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                                className="p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-colors"
                                 >
+                                {wishlistLoading ? (
+                                    <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
                                     <FontAwesomeIcon 
-                                        icon={wishlisted ? faHeart : faHeartRegular} 
-                                        className={wishlisted ? 'text-red-500' : 'text-gray-700'}
+                                    icon={isWishlisted ? faHeart : faHeartRegular} 
+                                    className={isWishlisted ? 'text-red-500' : 'text-gray-700'}
                                     />
+                                )}
                                 </button>
                                 <button 
                                     onClick={shareProduct}

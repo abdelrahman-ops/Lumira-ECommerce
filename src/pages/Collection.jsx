@@ -244,8 +244,17 @@ const Collection = () => {
                         </div>
 
                         {isLoading ? (
-                            <div className="flex justify-center items-center h-64">
-                                <InlineLoader />
+                            <div className="flex flex-col items-center justify-center h-96 space-y-6">
+                                <InlineLoader 
+                                    size = "xl"
+                                    color="primary"
+                                    showText={true}
+                                    text="Loading Collection..." 
+                                    className="my-8"
+                                />
+                                <p className="text-gray-500 text-sm max-w-md text-center px-4">
+                                    We're gathering the finest items for you. Please wait a moment...
+                                </p>
                             </div>
                         ) : isError ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center">

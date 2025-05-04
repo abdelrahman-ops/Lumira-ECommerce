@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets";
+import { url } from "../constant/URL";
 
 const SearchBar = ({ onSearch, instantResults, searchTerm, setSearchTerm }) => {
     const [isTyping, setIsTyping] = useState(false);
@@ -85,7 +86,7 @@ const SearchBar = ({ onSearch, instantResults, searchTerm, setSearchTerm }) => {
                             >
                             <div className="flex items-center gap-4">
                                 <img
-                                src={`https://server-e-commerce-seven.vercel.app${product.image}`}
+                                src={`${url}${product.image}`}
                                 alt={product.name}
                                 className="w-12 h-12 rounded-lg object-cover"
                                 />

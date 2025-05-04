@@ -6,12 +6,13 @@ import {
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink, useLocation, useParams } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
 
-
-const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
+const ProfileSidebar = ({ image, data }) => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { id } = useParams();
     const { logout } = useData();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isSwiping, setIsSwiping] = useState(false);
@@ -27,14 +28,20 @@ const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
     };
 
     const menuItems = [
-        { name: 'Profile', icon: faUser, section: 'profile' },
-        { name: 'Orders', icon: faShoppingCart, section: 'orders' },
-        { name: 'Wishlist', icon: faHeart, section: 'wishlist' },
-        { name: 'Payments', icon: faCreditCard, section: 'payments' },
-        { name: 'Addresses', icon: faMapMarkerAlt, section: 'addresses' },
-        { name: 'Notifications', icon: faBell, section: 'notifications' },
-        { name: 'Settings', icon: faCog, section: 'settings' },
+        { name: 'Profile', icon: faUser, section: '', path: '' },
+        { name: 'Orders', icon: faShoppingCart, section: 'orders', path: 'orders' },
+        { name: 'Wishlist', icon: faHeart, section: 'wishlist', path: 'wishlist' },
+        { name: 'Payments', icon: faCreditCard, section: 'payment', path: 'payment' },
+        { name: 'Addresses', icon: faMapMarkerAlt, section: 'address', path: 'address' },
+        { name: 'Notifications', icon: faBell, section: 'notifications', path: 'notifications' },
+        { name: 'Settings', icon: faCog, section: 'settings', path: 'settings' },
     ];
+
+    // Get current active section from URL
+    const getActiveSection = () => {
+        const pathParts = location.pathname.split('/');
+        return pathParts[pathParts.length - 1] || '';
+    };
 
     // Swipe functionality for horizontal navigation bar
     const handleTouchStart = (e) => {
@@ -48,13 +55,12 @@ const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
         const diff = startX - currentX;
         if (Math.abs(diff) > 50) {
             setIsSwiping(false);
-            setActiveSection((prev) => {
-                const currentIndex = menuItems.findIndex((item) => item.section === prev);
-                const newIndex = diff > 0 
-                    ? Math.min(currentIndex + 1, menuItems.length - 1) 
-                    : Math.max(currentIndex - 1, 0);
-                return menuItems[newIndex].section;
-            });
+            const currentSection = getActiveSection();
+            const currentIndex = menuItems.findIndex((item) => item.section === currentSection);
+            const newIndex = diff > 0 
+                ? Math.min(currentIndex + 1, menuItems.length - 1) 
+                : Math.max(currentIndex - 1, 0);
+            navigate(`/profile/${id}/${menuItems[newIndex].path}`);
         }
     };
 
@@ -103,28 +109,32 @@ const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
                 {/* Sidebar Menu */}
                 <div className="mt-4 flex-1">
                     {menuItems.map((item) => (
-                        <motion.div
+                        <NavLink
                             key={item.section}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.2, delay: 0.05 * menuItems.indexOf(item) }}
-                            className={`flex items-center gap-3 p-3 cursor-pointer rounded-lg transition-all duration-300 ${
-                                activeSection === item.section 
-                                    ? 'bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white shadow-lg' 
-                                    : 'hover:bg-indigo-100 hover:text-indigo-700'
-                            }`}
-                            onClick={() => setActiveSection(item.section)}
+                            to={`/profile/${id}/${item.path}`}
+                            end={item.path === ''}
                         >
-                            <FontAwesomeIcon 
-                                icon={item.icon} 
-                                className={`w-5 h-5 ${
-                                    activeSection === item.section ? 'text-white' : 'text-indigo-500'
-                                }`} 
-                            />
-                            {!isCollapsed && (
-                                <p className="text-sm font-medium">{item.name}</p>
-                            )}
-                        </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2, delay: 0.05 * menuItems.indexOf(item) }}
+                                className={`flex items-center gap-3 p-3 cursor-pointer rounded-lg transition-all duration-300 ${
+                                    getActiveSection() === item.section 
+                                        ? 'bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white shadow-lg' 
+                                        : 'hover:bg-indigo-100 hover:text-indigo-700'
+                                }`}
+                            >
+                                <FontAwesomeIcon 
+                                    icon={item.icon} 
+                                    className={`w-5 h-5 ${
+                                        getActiveSection() === item.section ? 'text-white' : 'text-indigo-500'
+                                    }`} 
+                                />
+                                {!isCollapsed && (
+                                    <p className="text-sm font-medium">{item.name}</p>
+                                )}
+                            </motion.div>
+                        </NavLink>
                     ))}
                 </div>
 
@@ -154,23 +164,26 @@ const ProfileSidebar = ({ image, data, activeSection, setActiveSection }) => {
                     {/* Menu Items */}
                     <div className="flex flex-1 justify-around">
                         {menuItems.map((item) => (
-                            <div
+                            <NavLink
                                 key={item.section}
-                                className={`flex flex-col items-center p-2 cursor-pointer rounded-lg transition-all duration-300 ${
-                                    activeSection === item.section 
-                                        ? 'bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white shadow-lg' 
-                                        : 'hover:bg-indigo-100 hover:text-indigo-700'
-                                }`}
-                                onClick={() => setActiveSection(item.section)}
+                                to={`/profile/${id}/${item.path}`}
+                                end={item.path === ''}
+                                className={({ isActive }) => 
+                                    `flex flex-col items-center p-2 cursor-pointer rounded-lg transition-all duration-300 ${
+                                        isActive 
+                                            ? 'bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white shadow-lg' 
+                                            : 'hover:bg-indigo-100 hover:text-indigo-700'
+                                    }`
+                                }
                             >
                                 <FontAwesomeIcon 
                                     icon={item.icon} 
                                     className={`w-5 h-5 ${
-                                        activeSection === item.section ? 'text-white' : 'text-indigo-500'
+                                        getActiveSection() === item.section ? 'text-white' : 'text-indigo-500'
                                     }`} 
                                 />
                                 <p className="text-xs font-medium mt-1">{item.name}</p>
-                            </div>
+                            </NavLink>
                         ))}
                     </div>
 

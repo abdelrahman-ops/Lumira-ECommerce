@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { assets } from '../assets/assets';
 import Title from './../components/common/Title';
 import InlineLoader from '../components/utility/InlineLoader';
+import { url } from '../components/constant/URL';
 
 const Cart = () => {
     const { isAuthenticated } = useAuth();
@@ -148,7 +149,7 @@ const Cart = () => {
         }
 
         const imageUrl = product?.image?.[0] 
-            ? `https://server-e-commerce-seven.vercel.app${product.image[0]}`
+            ? `${url}${product.image[0]}`
             : 'https://via.placeholder.com/150';
 
         return (
@@ -210,7 +211,7 @@ const Cart = () => {
 
     return (
         <div className="border-t pt-14">
-            <ToastContainer position="bottom-right" autoClose={3000} />
+            <ToastContainer position="top-right" autoClose={3000} />
             
             <div className="text-2xl mb-3">
                 <Title text1={'YOUR'} text2={'CART'} />

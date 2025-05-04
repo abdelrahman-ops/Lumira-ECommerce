@@ -4,34 +4,23 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
-import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import Title from '../components/common/Title';
-// import { useCart } from '../context/CartContext';
 import { loginUser } from '../services/api';
 
 const Login = () => {
-    const { login } = useAuth();
-    const { storeUserData } = useData();
+    const { login ,storeUserData} = useData();
     const navigate = useNavigate();
     const location = useLocation();
-    // const { transferCart } = useCart();
+
 
     const handleLoginSuccess = async (token, user) => {
         try {
-            // Set token in cookies and auth context
-            Cookies.set("token", token, { expires: 7 }); // Expires in 7 days
+            Cookies.set("token", token, { expires: 7 });
             login(token);
-            
-            // Store user data in context
             storeUserData(user);
-            
-            // Transfer guest cart to user cart
-            // await transferCart();
-            
             toast.success("Login successful!");
             
-            // Redirect to previous page or home
             const redirectPath = location.state?.from?.pathname || '/';
             navigate(redirectPath);
         } catch (error) {
