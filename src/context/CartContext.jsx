@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
 import Cookies from 'js-cookie';
 import { 
@@ -185,7 +187,7 @@ export const CartProvider = ({ children }) => {
                 setCartState(prev => {
                     const existingIndex = prev.items.findIndex(
                         i => i.product._id === sanitizedItem.product._id && 
-                             i.size === sanitizedItem.size
+                            i.size === sanitizedItem.size
                     );
                     
                     const updatedItems = existingIndex >= 0
@@ -208,7 +210,7 @@ export const CartProvider = ({ children }) => {
                 });
             }
 
-            // toast.success(`${sanitizedItem.product.name} ${MESSAGES.success.add}`);
+            toast.success(`${sanitizedItem.product.name} ${MESSAGES.success.add}`);
         } catch (error) {
             console.error('Add to cart error:', error);
             setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
@@ -240,7 +242,7 @@ export const CartProvider = ({ children }) => {
                 });
             }
             
-            // toast.success(MESSAGES.success.remove);
+            toast.success(MESSAGES.success.remove);
         } catch (error) {
             console.error('Remove from cart error:', error);
             setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));

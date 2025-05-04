@@ -78,6 +78,7 @@ export const DataProvider = ({ children }) => {
     return (
         <DataContext.Provider value={{
             user,
+            setUserData,
             isLoading,
             error,
             isAuthenticated,
