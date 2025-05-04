@@ -4,8 +4,8 @@ import { Autoplay, EffectFade, Parallax } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/parallax";
-import { assets } from "../assets/assets";
-import "../css/Hero.css";
+import { assets } from "../../assets/assets";
+import "../../css/Hero.css";
 import { useEffect } from "react";
 
 const Hero = () => {

@@ -1,9 +1,9 @@
 
 
-import BestSeller from '../components/BestSeller';
-import Hero from '../components/Hero';
-import Latest from '../components/Latest';
-import Sletter from '../components/Sletter';
+import BestSeller from '../components/home/BestSeller';
+import Hero from '../components/home/Hero';
+import Latest from '../components/home/Latest';
+import Sletter from '../components/home/Sletter';
 
 const Home = () => {
     return(

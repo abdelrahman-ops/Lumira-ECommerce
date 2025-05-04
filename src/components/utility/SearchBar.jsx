@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
-import { assets } from "../assets/assets";
+import { assets } from "../../assets/assets";
 
 const SearchBar = ({ onSearch, instantResults, searchTerm, setSearchTerm }) => {
     const [isTyping, setIsTyping] = useState(false);

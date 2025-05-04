@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Profile from '../Profile';
+import Profile from '../../pages/ProfileDashboard';
 import EditProfile from './EditProfile'
 
 const ProfileHome = () => {

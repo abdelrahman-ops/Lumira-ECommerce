@@ -1,11 +1,11 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useProductsQuery } from "../hooks/useProductsQuery";
-import ProductItem from "../components/ProductCard";
-import Title from "../components/Title";
-import InlineLoader from "../components/InlineLoader";
+import ProductCard from "../components/product/card/ProductCard";
+import Title from "../components/common/Title";
+import InlineLoader from "../components/utility/InlineLoader";
 import { useSearchParams } from "react-router-dom";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../components/utility/SearchBar";
 
 import { assets } from "../assets/assets";
 
@@ -268,7 +268,7 @@ const Collection = () => {
                                 {filteredProducts.length > 0 ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                                         {filteredProducts.map((el) => (
-                                            <ProductItem
+                                            <ProductCard
                                                 key={el._id}
                                                 _id={el._id}
                                                 name={el.name}

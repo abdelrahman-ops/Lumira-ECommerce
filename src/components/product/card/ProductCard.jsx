@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useCallback, useEffect } from "react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../../../context/CartContext";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LazyLoadImage } from "react-lazy-load-image-component";

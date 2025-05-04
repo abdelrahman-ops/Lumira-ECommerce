@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { useAuth } from "../context/AuthContext";
 import { useData } from "../context/DataContext";
 import PhoneNumberInput from "../hooks/PhoneNumberInput";
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 import { motion } from "framer-motion";
 import { registerUser } from "../services/api"; // Import from api.ts
 

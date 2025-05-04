@@ -1,6 +1,6 @@
 import { assets } from '../assets/assets';
-import Title from './../components/Title';
-import Settler from '../components/Sletter';
+import Title from './../components/common/Title';
+import Settler from '../components/home/Sletter';
 
 const Collection = () => {
     return (

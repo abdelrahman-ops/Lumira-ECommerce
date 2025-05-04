@@ -5,15 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useData } from '../context/DataContext';
 
-import ProfileSidebar from '../components/ProfileSidebar';
-import ProfileLoader from '../components/ProfileLoader';
+import ProfileSidebar from '../components/profile/ProfileSidebar';
+import ProfileLoader from '../components/profile/ProfileLoader';
 
-import ProfileDetails from './profile/ProfileDetails';
-import OrderHistory from './profile/OrderHistory';
-import WishList from './profile/WishList';
-import Payment from './profile/Payment';
-import Address from './profile/Address';
-import Notifications from './profile/Notifications';
+import ProfileDetails from '../components/profile/ProfileDetails';
+import OrderHistory from '../components/profile/OrderHistory';
+import WishList from '../components/profile/WishList';
+import Payment from '../components/profile/Payment';
+import Address from '../components/profile/Address';
+import Notifications from '../components/profile/Notifications';
 // import Settings from './profile/Settings';
 
 const DEFAULT_SECTION = 'profile';
@@ -29,7 +29,7 @@ const getUserFormData = (user) => ({
     image: user?.image || null,
 });
 
-const Profile = () => {
+const ProfileDashboard = () => {
     const { user, fetchUserData, updateUserData } = useData();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -200,4 +200,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfileDashboard;

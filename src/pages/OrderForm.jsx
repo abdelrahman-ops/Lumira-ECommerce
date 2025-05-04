@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Title from './../components/Title';
+import Title from './../components/common/Title';
 import { assets } from '../assets/assets';
 
 const OrderForm = () => {

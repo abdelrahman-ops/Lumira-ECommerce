@@ -12,13 +12,13 @@ import {
     faShareNodes
 } from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import { assets } from "../assets/assets";
-import { useShop } from "../context/ShopContext";
-import { useCart } from '../context/CartContext';
-import InlineLoader from './InlineLoader';
-import ProductTabs from './product/ProductDetail/ProductTabs';
-import RelatedProducts from './product/ProductDetail/RelatedProducts';
-import { renderStars } from '../utils/renderStars';
+import { assets } from "../../../assets/assets";
+import { useShop } from "../../../context/ShopContext";
+import { useCart } from '../../../context/CartContext';
+import InlineLoader from '../../utility/InlineLoader';
+import ProductTabs from './ProductTabs';
+import RelatedProducts from './RelatedProducts';
+import { renderStars } from '../../../utils/renderStars';
 
 const ProductDetail = () => {
     const [selectedSize, setSelectedSize] = useState('');

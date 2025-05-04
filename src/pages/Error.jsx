@@ -1,7 +1,7 @@
 // import React from 'react'
 
 import { Link } from "react-router-dom"
-import Title from './../components/Title';
+import Title from './../components/common/Title';
 
 
 const Error = () => {

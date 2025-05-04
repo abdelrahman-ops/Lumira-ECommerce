@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { assets } from '../assets/assets';
-import Settler from '../components/Sletter';
-import Title from './../components/Title';
+import Settler from '../components/home/Sletter';
+import Title from './../components/common/Title';
 
 const About = () => {
     return (

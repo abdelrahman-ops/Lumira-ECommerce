@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
-import Title from '../components/Title';
+import Title from '../components/common/Title';
 // import { useCart } from '../context/CartContext';
 import { loginUser } from '../services/api';
 

@@ -6,8 +6,8 @@ import { useShop } from '../context/ShopContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { assets } from '../assets/assets';
-import Title from './../components/Title';
-import InlineLoader from '../components/InlineLoader';
+import Title from './../components/common/Title';
+import InlineLoader from '../components/utility/InlineLoader';
 
 const Cart = () => {
     const { isAuthenticated } = useAuth();

@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from "react";
-import Title from "./Title";
-import ProductItem from "./ProductCard";
-import InlineLoader from "./InlineLoader";
-import { fetchProducts } from "../services/api";
+import Title from "../common/Title";
+import ProductCard from "../product/card/ProductCard";
+import InlineLoader from "../utility/InlineLoader";
+import { fetchProducts } from "../../services/api";
 
 const Latest = () => {
     const [latestCollection, setLatestCollection] = useState([]);
@@ -55,7 +55,7 @@ const Latest = () => {
                 <>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
                         {latestCollection.map((product) => (
-                            <ProductItem
+                            <ProductCard
                                 key={product._id}
                                 _id={product._id}
                                 name={product.name}

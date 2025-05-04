@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { Toaster } from 'react-hot-toast';
 
 import { AuthProvider } from './context/AuthContext';
-import {DataProvider} from './context/DataContext';
+import { DataProvider } from './context/DataContext';
 import { CartProvider } from './context/CartContext';
 import { ProductProvider } from './context/ProductContext';
 
@@ -15,24 +15,25 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Cart from './pages/Cart';
-import Profile from './pages/Profile';
+import ProfileDashboard from './pages/ProfileDashboard';
 import Error from './pages/Error';
-import WishList from './pages/profile/WishList';
+import WishList from './components/profile/WishList';
 import Register from './pages/Register';
 
 
 import Navbar from './components/Navbar';
-import ProductDetail from './components/ProductDetail';
+import ProductDetail from './components/product/detail/ProductDetail';
 import Footer from './components/Footer';
-import ScrollToTop from './components/ScrollToTop';
+import ScrollToTop from './components/utility/ScrollToTop';
 
 // import { products } from "./assets/assets";
 
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/utility/ProtectedRoute';
 import OrderForm from './pages/OrderForm';
 import { ShopProvider } from "./context/ShopContext";
 
 import ErrorBoundary from './utils/ErrorBoundary'
+
 
 
 
@@ -77,11 +78,11 @@ const Main = () => {
 					<Route path='/contact' element={<Contact />} />
 					<Route path='/login' element={<Login />} />
 					<Route path='/register' element={<Register />} />
-					<Route path='/profile/:id' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+					<Route path='/profile/:id' element={<ProtectedRoute> <ProfileDashboard /> </ProtectedRoute>} />
 					<Route path='/error' element={<Error />} />
 					<Route path='/cart' element={ <Cart /> } />
 					<Route path='/place-order' element={ <OrderForm />} />
-					<Route path='/wishlist' element={<WishList />} />
+					<Route path='/profile/:id/wishlist' element={<WishList />} />
 					<Route path='/product/:id' element={<ProductDetail />} />
 				</Routes>
 				<Footer />
