@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useState, useCallback, useEffect } from "react";
 import { useCart } from "../../../context/CartContext";
@@ -10,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Star, StarHalf, Check } from "lucide-react";
 import { useWishlistContext } from "../../../context/WishlistContext";
 import { url } from "../../constant/URL";
+// import { useCartActions } from "../../../stores/cartStore";
 
 const ProductCard = ({
     _id,
@@ -28,10 +28,7 @@ const ProductCard = ({
     const isFavorite = isInWishlist(_id, 'default');
 
 
-    const imageUrl = image
-        ? `${url}${image}`
-        : "/fallback-image.jpg";
-
+    const imageUrl = image ? `${url}${image}` : "/fallback-image.jpg";
     const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
 
     const toggleFavorite = useCallback((e) => {
@@ -46,7 +43,7 @@ const ProductCard = ({
                 image: image
             }, 'default');
         }
-    }, [_id, name, isFavorite, addItem, removeItem]);
+    }, [_id, name, isFavorite, addItem, removeItem,price,image]);
 
     const handleAddToCart = useCallback(async (e) => {
         e?.preventDefault();
@@ -79,7 +76,7 @@ const ProductCard = ({
             console.error("Add to cart error:", error);
             toast.error(error.message || "Failed to add item to cart. Please try again.");
         }
-    }, [_id, name, discountedPrice, imageUrl, sizes, selectedSize, addToCart]);
+    }, [_id, name, discountedPrice, image, sizes.length, selectedSize, addToCart]);
 
     const formatPrice = (value) => {
         return (value || 0).toFixed(2);

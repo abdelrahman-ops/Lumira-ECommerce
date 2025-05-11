@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useCallback, useMemo } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlistContext } from '../context/WishlistContext';
@@ -24,7 +26,7 @@ interface WishlistCardProps {
     isProcessing: boolean;
     isSelected?: boolean;
     onSelect?: (id: string) => void;
-    selectedSize?: string;
+    selectedSize?: string | null;
 }
 
 const WishlistCard = ({
@@ -67,7 +69,6 @@ const WishlistCard = ({
                     name,
                     price,
                     image,
-                    sizes
                 }, 'default');
                 toast.success('Added to wishlist');
             }
@@ -130,26 +131,6 @@ const WishlistCard = ({
 
     const formatPrice = (value: number) => (value || 0).toFixed(2);
 
-    const renderStars = () => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<Star key={`full-${i}`} className="w-3 h-3 fill-yellow-400 text-yellow-400" />);
-        }
-
-        if (hasHalfStar) {
-            stars.push(<StarHalf key="half" className="w-3 h-3 fill-yellow-400 text-yellow-400" />);
-        }
-
-        const emptyStars = 5 - stars.length;
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<Star key={`empty-${i}`} className="w-3 h-3 text-gray-300" />);
-        }
-
-        return stars;
-    };
 
     return (
         <motion.div
@@ -197,13 +178,7 @@ const WishlistCard = ({
                     />
                 </button>
 
-                {/* Rating (Bottom Left) */}
-                {rating > 0 && (
-                    <div className="absolute bottom-2 left-2 flex items-center bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs">
-                        {renderStars()}
-                        <span className="ml-1 text-gray-700">{rating.toFixed(1)}</span>
-                    </div>
-                )}
+                
             </div>
 
             {/* Content Section */}
@@ -284,7 +259,7 @@ const WishlistCard = ({
                             {addingToCart ? (
                                 <InlineLoader
                                     size="sm"
-                                    color="white"
+                                    color="primary"
                                     showText={false}
                                     className="my-0"
                                 />
