@@ -50,7 +50,7 @@ const Navbar = () => {
     };
 
     return (
-        <div className="relative py-5 m-0 font-medium z-10 bg-white">
+        <div className="relative py-5 m-0 font-medium bg-white z-50">
             <div className="container mx-auto px-4 flex items-center justify-between">
                 <Link to="/">
                     <motion.img 

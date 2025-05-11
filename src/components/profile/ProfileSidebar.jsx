@@ -209,7 +209,7 @@ const ProfileSidebar = ({ image, data }) => {
                                 </div>
                                 <span className="text-xs mt-1">More</span>
                             </button>
-                            <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 hidden group-hover:block">
+                            <div className="absolute bottom-full -right-3  w-48 bg-white rounded-lg shadow-xl border border-gray-200 hidden group-hover:block">
                                 {menuItems.slice(4).map((item) => (
                                     <NavLink
                                         key={item.section}

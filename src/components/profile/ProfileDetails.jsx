@@ -112,7 +112,7 @@ const ProfileDetails = () => {
                             <button
                                 onClick={() => !loading && setIsEditing(false)}
                                 disabled={loading}
-                                className="flex items-center gap-2 text-gray-700 border border-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-50 transition disabled:opacity-50"
+                                className="flex items-center gap-2 text-gray-700 border border-gray-300 px-5 py-2.5 rounded-2xl hover:bg-gray-50 transition disabled:opacity-50"
                             >
                                 <FiX size={18} />
                                 Cancel
@@ -120,7 +120,8 @@ const ProfileDetails = () => {
                             <button
                                 onClick={handleSave}
                                 disabled={loading}
-                                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-50"
+                                className="flex items-center gap-2 text-sm
+                                bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-50"
                             >
                                 {loading ? (
                                     <>
@@ -133,7 +134,7 @@ const ProfileDetails = () => {
                                 ) : (
                                     <>
                                         <FiSave size={18} />
-                                        Save Changes
+                                        Save
                                     </>
                                 )}
                             </button>
@@ -141,7 +142,7 @@ const ProfileDetails = () => {
                     ) : (
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition"
+                            className="flex items-center text-sm gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition"
                         >
                             <FiEdit2 size={18} />
                             Edit Profile
