@@ -1,66 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
-
-.hero-container {
-    font-family: 'Prata', serif;
-    background: #0f0f0f;
-    isolation: isolate;
-    border-radius: 1.5rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+/* Hero.css */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.swiper-slide img {
-    backface-visibility: hidden;
-    transform: translateZ(0);
-    transition: transform 8s ease-out;
+.glow-text {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
-.animate-fade-in {
-    animation: fade-in 1.5s ease-out forwards;
+.hover-glow {
+  transition: box-shadow 0.3s ease;
 }
-
-.animate-slide-in {
-    animation: slide-in 1.2s ease-out forwards;
-}
-
-.animate-bounce-slow {
-    animation: bounce-slow 3s ease-in-out infinite;
-}
-/* Custom pagination bullets */
-.swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 1;
-    transition: all 0.3s ease;
-}
-
-.swiper-pagination-bullet-active {
-    background: white;
-    width: 30px;
-    border-radius: 5px;
-}
-
-/* Animations */
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slide-in {
-    from { 
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fade-in 1s ease forwards;
-}
-
-.animate-slide-in {
-    animation: slide-in 1s ease forwards;
+.hover-glow:hover {
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
 }
