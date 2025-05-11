@@ -68,7 +68,7 @@ const Wishlist = () => {
 
     if (loading) {
         return (
-            <div className="space-y-6">
+            <div className="space-y-6  p-6 md:p-8 rounded-3xl shadow-xl transition-all duration-300 border-2">
                 {Array.from({ length: 3 }).map((_, i) => (
                     <div key={`skeleton-${i}`} className="flex w-full bg-white rounded-xl shadow-sm overflow-hidden">
                         <div className="w-1/3">

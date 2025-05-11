@@ -223,7 +223,7 @@ const Settings: React.FC<SettingsProps> = () => {
     }, [showPasswordForm]);
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+        <div className="bg-white  max-w-4xl mx-auto  p-6 md:p-8 rounded-3xl shadow-xl transition-all duration-300 border-2">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h1>
             
             <div className="flex flex-col md:flex-row gap-6">
