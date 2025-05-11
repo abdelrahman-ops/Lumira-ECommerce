@@ -39,7 +39,7 @@ const ProfileDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-pink-100 py-10">
+        <div className="min-h-screen">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar */}
@@ -53,7 +53,7 @@ const ProfileDashboard = () => {
                     />
                     
                     {/* Main Content Area */}
-                    <div className="flex-1 bg-white shadow-xl rounded-2xl p-6 transition-all duration-300 ease-in-out">
+                    <div className="flex-1 transition-all duration-300 ease-in-out">
                         <Outlet context={{ 
                             user, 
                             imagePreview, 
