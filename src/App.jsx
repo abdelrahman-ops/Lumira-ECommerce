@@ -38,6 +38,7 @@ import Notifications from './components/profile/Notifications';
 import Settings from './components/profile/Settings';
 import OrderHistory from './components/profile/OrderHistory';
 import ProfileDetails from './components/profile/ProfileDetails';
+// import MultiStepForm from './draft/register/MultiStepForm';
 
 
 
@@ -80,6 +81,7 @@ const Main = () => {
 					<Route path='/contact' element={<Contact />} />
 					<Route path='/login' element={<Login />} />
 					<Route path='/register' element={<Register />} />
+					{/* <Route path='/register' element={<MultiStepForm />} /> */}
 					<Route path='/profile/:id' element={<ProtectedRoute> <ProfileDashboard /></ProtectedRoute>}>
 						<Route index element={<ProfileDetails />} />
 						<Route path='orders' element={<OrderHistory />} />

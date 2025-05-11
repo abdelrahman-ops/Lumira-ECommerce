@@ -12,37 +12,14 @@ import {
 } from '../services/api';
 import { toast } from 'react-toastify';
 import { debounce } from 'lodash';
+import { MESSAGES } from '../components/constant/messages';
 
 // Configuration
 const CART_CONFIG = {
     maxQuantity: 100,
     guestCartKey: 'cartItems',
     debounceTime: 500,
-    maxPrice: 100000 // Prevent unrealistic prices
-};
-
-// Messages
-const MESSAGES = {
-    errors: {
-        add: 'Failed to add item to cart',
-        remove: 'Failed to remove item from cart',
-        update: 'Failed to update cart item',
-        clear: 'Failed to clear cart',
-        transfer: 'Failed to transfer cart',
-        load: 'Failed to load cart',
-        validation: {
-            invalidItem: 'Invalid cart item',
-            maxQuantity: `Maximum quantity per item is ${CART_CONFIG.maxQuantity}`,
-            maxPrice: `Maximum price exceeded`
-        }
-    },
-    success: {
-        add: 'Item added to cart!',
-        remove: 'Item removed from cart!',
-        update: 'Quantity updated!',
-        clear: 'Cart cleared successfully!',
-        transfer: 'Cart transferred successfully!'
-    }
+    maxPrice: 100000
 };
 
 const CartContext = createContext();
@@ -164,7 +141,7 @@ export const CartProvider = ({ children }) => {
         }
     }, [token, getGuestCart, calculateTotals]);
 
-    const addToCart = async (item) => {
+    const addToCart = useCallback(async (item) => {
         try {
             validateCartItem(item);
             setCartState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -217,9 +194,9 @@ export const CartProvider = ({ children }) => {
             toast.error(error.message || MESSAGES.errors.add);
             throw error;
         }
-    };
+    }, [token, loadCart, calculateTotals]);
 
-    const removeFromCart = async (productId, size) => {
+    const removeFromCart = useCallback(async (productId, size) => {
         try {
             setCartState(prev => ({ ...prev, isLoading: true, error: null }));
             
@@ -249,9 +226,9 @@ export const CartProvider = ({ children }) => {
             toast.error(MESSAGES.errors.remove);
             throw error;
         }
-    };
+    }, [token, loadCart, calculateTotals]);
 
-    const updateCart = async (productId, size, quantity) => {
+    const updateCart = useCallback(async (productId, size, quantity) => {
         try {
             if (quantity <= 0) {
                 await removeFromCart(productId, size);
@@ -290,9 +267,9 @@ export const CartProvider = ({ children }) => {
             toast.error(MESSAGES.errors.update);
             throw error;
         }
-    };
+    }, [token, removeFromCart, loadCart, calculateTotals]);
 
-    const clearCart = async () => {
+    const clearCart = useCallback(async () => {
         try {
             setCartState(prev => ({ ...prev, isLoading: true, error: null }));
             
@@ -320,9 +297,9 @@ export const CartProvider = ({ children }) => {
             toast.error(MESSAGES.errors.clear);
             throw error;
         }
-    };
+    }, [token]);
 
-    const transferCart = async () => {
+    const transferCart = useCallback(async () => {
         if (!token) return;
         
         try {
@@ -341,12 +318,12 @@ export const CartProvider = ({ children }) => {
             toast.error(MESSAGES.errors.transfer);
             throw error;
         }
-    };
+    }, [token, getGuestCart, loadCart]);
 
     // Optimizations
     const debouncedUpdateCart = useMemo(
         () => debounce(updateCart, CART_CONFIG.debounceTime),
-        [token]
+        [updateCart]
     );
 
     // Effects
@@ -380,7 +357,20 @@ export const CartProvider = ({ children }) => {
         clearCart,
         transferCart,
         loadCart
-    }), [cartState, debouncedUpdateCart]);
+    }), [
+        cartState.items, 
+        cartState.totalQuantity, 
+        cartState.subtotal,
+        cartState.isLoading,
+        cartState.isCartLoaded,
+        cartState.error,
+        addToCart,
+        removeFromCart,
+        debouncedUpdateCart,
+        clearCart,
+        transferCart,
+        loadCart
+    ]);
 
     return (
         <CartContext.Provider value={contextValue}>
