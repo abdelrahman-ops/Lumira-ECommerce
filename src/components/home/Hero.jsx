@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade, Parallax, Navigation, Pagination } from 'swiper/modules';
+import { Autoplay, EffectFade, Parallax,  } from 'swiper/modules';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiShoppingBag, FiHeart, FiChevronRight } from 'react-icons/fi';
-import { FaOpencart, FaChevronRight } from 'react-icons/fa';
+import { FaOpencart } from 'react-icons/fa';
 import { TbBrandStorytel, TbSparkles } from 'react-icons/tb';
 import { PiFlowerLotus, PiDiamond } from 'react-icons/pi';
 import 'swiper/css';

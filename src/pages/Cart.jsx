@@ -232,7 +232,7 @@ const Cart = () => {
             </div>
 
             {showDeleteConfirmation && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg">
                         <p className="text-lg font-semibold mb-4">Remove this item?</p>
                         <div className="flex gap-4">
