@@ -1,10 +1,11 @@
+import { FaRegHeart } from "react-icons/fa";
+
 export default function EmptyWishlist() {
     return (
-        <div className="flex flex-col items-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center py-12
+        space-y-6 p-6 md:p-8 rounded-3xl shadow-xl transition-all duration-300 border-2">
             <div className="text-gray-300 text-5xl mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
+                <FaRegHeart className="w-8 h-8"/>
             </div>
             <p className="text-gray-600 text-lg">Your wishlist is empty</p>
             <p className="text-gray-400 text-sm mt-1">Start adding items you love</p>
