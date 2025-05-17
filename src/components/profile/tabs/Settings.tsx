@@ -15,9 +15,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { useData } from '../../context/DataContext';
+import { useData } from '../../../context/DataContext';
 import { toast } from 'react-toastify';
-import { updatePassword, deleteUser } from '../../services/api';
+import { updatePassword, deleteUser } from '../../../services/api';
 
 interface PasswordFields {
     current: string;

@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { FiUser, FiCalendar, FiPhone, FiMail, FiCamera, FiEdit2, FiSave, FiX } from 'react-icons/fi';
-import PhoneNumberInput from '../../hooks/PhoneNumberInput';
+import PhoneNumberInput from '../../../hooks/PhoneNumberInput';
 import toast from 'react-hot-toast';
-import { useData } from '../../context/DataContext';
-import { url } from '../constant/URL';
-import Title from '../common/Title';
+import { useData } from '../../../context/DataContext';
+import Title from '../../common/Title';
 
 const ProfileDetails = () => {
-    const { user, imagePreview, setImagePreview } = useOutletContext();
+    const { user, image, setImagePreview } = useOutletContext();
     const { updateUserData, setUserData } = useData();
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ ...user });
@@ -93,7 +92,7 @@ const ProfileDetails = () => {
         }
     };
 
-    const displayImage = imagePreview || (user?.image && `${url}${user.image}`) || '/default-avatar.png';
+    const displayImage = image;
 
     return (
         <div className="p-6 md:p-8 rounded-3xl bg-white shadow-lg border border-gray-100 transition-all duration-300">

@@ -30,8 +30,8 @@ interface CartItem {
     // product: Product | string; // Can be populated or just ID
     quantity: number;
     size: string;
-    price?: number; // Optional cached price at time of addition
-    addedAt?: string; // Timestamp
+    // price?: number;
+    // addedAt?: string;
 }
 
 interface Cart {

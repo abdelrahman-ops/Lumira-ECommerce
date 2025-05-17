@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useState, useCallback, useMemo } from "react";
-import { useCart } from "../context/CartContext";
-import { useWishlistContext } from '../context/WishlistContext';
+import { useCart } from "../../../../context/CartContext";
+import { useWishlistContext } from '../../../../context/WishlistContext';
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Star, StarHalf, Check, X } from "lucide-react";
-import { url } from "../components/constant/URL";
-import { useShop } from "../context/ShopContext";
-import InlineLoader from "./utility/InlineLoader";
-import  useMediaQuery  from "../components/utility/useMediaQuery";
+import { url } from "../../../../components/constant/URL";
+import { useShop } from "../../../../context/ShopContext";
+import InlineLoader from "../../../../components/utility/InlineLoader";
+import  useMediaQuery  from "../../../../components/utility/useMediaQuery";
 
 interface WishlistCardProps {
     _id: string;

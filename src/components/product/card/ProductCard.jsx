@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useCart } from "../../../context/CartContext";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -25,25 +25,22 @@ const ProductCard = ({
     const [showSizes, setShowSizes] = useState(false);
     const [selectedSize, setSelectedSize] = useState(null);
     const { isInWishlist, addItem, removeItem } = useWishlistContext();
-    const isFavorite = isInWishlist(_id, 'default');
+    const isFavorite = useMemo(() => isInWishlist(_id, 'default'), [_id, isInWishlist]);
 
 
-    const imageUrl = image ? `${url}${image}` : "/fallback-image.jpg";
-    const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
+    const imageUrl = useMemo(() => 
+        image ? `${url}${image}` : "/fallback-image.jpg",
+        [image]
+    );
+    const discountedPrice = useMemo(() => 
+        discount > 0 ? price * (1 - discount / 100) : price,
+        [price, discount]
+    );
 
     const toggleFavorite = useCallback((e) => {
         e.preventDefault();
-        if (isFavorite) {
-            removeItem(_id, 'default', name);
-        } else {
-            addItem({
-                _id,
-                name,
-                price: price,
-                image: image
-            }, 'default');
-        }
-    }, [_id, name, isFavorite, addItem, removeItem,price,image]);
+        isFavorite ? removeItem(_id, 'default', name) : addItem({_id, name, price, image}, 'default');
+    }, [_id, name, price, image, isFavorite, addItem, removeItem]);
 
     const handleAddToCart = useCallback(async (e) => {
         e?.preventDefault();
@@ -55,18 +52,12 @@ const ProductCard = ({
 
         try {
             const cartItem = {
-                product: {
-                    _id,
-                    name,
-                    price: discountedPrice,
-                    image,
-                },
-                size: selectedSize || 'One Size', 
+                product: { _id }, // Only send necessary product data
+                size: selectedSize || 'One Size',
                 quantity: 1
             };
             console.log(cartItem);
             
-
             await addToCart(cartItem);
             setShowSizes(false);
             toast.success(
@@ -78,18 +69,37 @@ const ProductCard = ({
         }
     }, [_id, name, discountedPrice, image, sizes.length, selectedSize, addToCart]);
 
-    const formatPrice = (value) => {
-        return (value || 0).toFixed(2);
-    };
+    const formatPrice = (value) => value.toFixed(2);
 
     const handleQuickAdd = useCallback((e) => {
         e.preventDefault();
-        if (sizes.length > 0) {
-            setShowSizes(true);
-        } else {
-            handleAddToCart();
-        }
+        sizes.length > 0 ? setShowSizes(true) : handleAddToCart();
     }, [sizes.length, handleAddToCart]);
+
+    const ratingStars = useMemo(() => {
+        if (!rating) return null;
+        
+        return (
+            <div className="flex items-center gap-1 mb-1">
+                {[...Array(5)].map((_, i) => {
+                    const full = i < Math.floor(rating);
+                    const half = i === Math.floor(rating) && rating % 1 !== 0;
+                    return (
+                        <span key={i}>
+                            {full ? (
+                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            ) : half ? (
+                                <StarHalf className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            ) : (
+                                <Star className="w-4 h-4 text-gray-300 fill-none" />
+                            )}
+                        </span>
+                    );
+                })}
+                <span className="text-xs text-gray-500">({rating.toFixed(1)})</span>
+            </div>
+        );
+    }, [rating]);
 
     return (
         <motion.div
@@ -107,6 +117,7 @@ const ProductCard = ({
                         effect="blur"
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                         onError={() => setHasError(true)}
+                        threshold={100}
                     />
                 </Link>
 
@@ -121,8 +132,6 @@ const ProductCard = ({
                     </motion.div>
                 )}
 
-
-
                 {/* Action Buttons */}
                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                     <motion.button
@@ -130,6 +139,7 @@ const ProductCard = ({
                         className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
+                        aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
                     >
                         <Heart
                             className="w-5 h-5"
@@ -146,6 +156,7 @@ const ProductCard = ({
                         className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
+                        aria-label="Add to cart"
                     >
                         <ShoppingCart className="w-5 h-5 text-indigo-600" />
                     </motion.button>
@@ -160,27 +171,7 @@ const ProductCard = ({
                     </h3>
                 </Link>
 
-                {/* Rating */}
-                {rating > 0 && (
-                    <div className="flex items-center gap-1 mb-1">
-                        {[...Array(5)].map((_, i) => {
-                            const full = i < Math.floor(rating);
-                            const half = i === Math.floor(rating) && rating % 1 !== 0;
-                            return (
-                                <span key={i}>
-                                    {full ? (
-                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                    ) : half ? (
-                                        <StarHalf className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                    ) : (
-                                        <Star className="w-4 h-4 text-gray-300 fill-none" />
-                                    )}
-                                </span>
-                            );
-                        })}
-                        <span className="text-xs text-gray-500">({rating.toFixed(1)})</span>
-                    </div>
-                )}
+                {ratingStars}
 
                 {/* Price */}
                 <div className="flex items-center justify-between">

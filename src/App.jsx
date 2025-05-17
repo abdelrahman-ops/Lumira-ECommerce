@@ -31,13 +31,13 @@ import { ShopProvider } from "./context/ShopContext";
 
 import ErrorBoundary from './utils/ErrorBoundary'
 import { WishlistProvider } from './context/WishlistContext';
-import Wishlist from './components/profile/WishList';
-import Payment from './components/profile/Payment';
-import Address from './components/profile/Address';
-import Notifications from './components/profile/Notifications';
-import Settings from './components/profile/Settings';
-import OrderHistory from './components/profile/OrderHistory';
-import ProfileDetails from './components/profile/ProfileDetails';
+import Wishlist from './components/profile/tabs/wishlist/WishList';
+import Payment from './components/profile/tabs/Payment';
+import Address from './components/profile/tabs/Address';
+import Notifications from './components/profile/tabs/Notifications';
+import Settings from './components/profile/tabs/Settings';
+import OrderHistory from './components/profile/tabs/OrderHistory';
+import ProfileDetails from './components/profile/tabs/ProfileDetails';
 // import MultiStepForm from './draft/register/MultiStepForm';
 
 

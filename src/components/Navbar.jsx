@@ -7,7 +7,7 @@ import '../css/Nav.css';
 import { useData } from '../context/DataContext';
 import { 
     FaSearch, 
-    FaUserCircle,
+    // FaUserCircle,
     FaStore,
     FaInfoCircle,
     FaEnvelope,
@@ -29,7 +29,7 @@ const Navbar = () => {
 
     const handleLoginClick = () => {
         if (isAuthenticated) {
-            navigate(`/profile/${user._id}`);
+            navigate(`/profile/${user._id}/`);
         } else {
             navigate('/login', { state: { showSignUp: false } });
         }
@@ -260,8 +260,8 @@ const Navbar = () => {
                             </ul>
                         </nav>
 
-                        {isAuthenticated && (
-                            <div className="p-4 border-t">
+                        {/* {isAuthenticated && (
+                            <div className="p-4 border-t bg-red">
                                 <button 
                                     onClick={() => {
                                         handleNavLinkClick();
@@ -273,7 +273,7 @@ const Navbar = () => {
                                     <span>MY PROFILE</span>
                                 </button>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </motion.aside>
             </div>

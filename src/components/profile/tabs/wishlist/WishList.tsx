@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useWishlistContext } from '../../context/WishlistContext';
-import { useCart } from '../../context/CartContext';
-import WishlistCard from '../../components/WishlistCard'; // Import the new component
-import { url } from '../constant/URL';
+import { useWishlistContext } from '../../../../context/WishlistContext';
+import { useCart } from '../../../../context/CartContext';
+import WishlistCard from './WishlistCard'; // Import the new component
+import { url } from "../../../../components/constant/URL";
 
 interface ProductImage {
     url: string;

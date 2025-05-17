@@ -10,7 +10,7 @@ import {
     updateCartItem, 
     clearUserCart 
 } from '../services/api';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { debounce } from 'lodash';
 import { MESSAGES } from '../components/constant/messages';
 

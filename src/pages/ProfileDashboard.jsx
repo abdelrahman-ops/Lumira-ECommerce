@@ -50,13 +50,14 @@ const ProfileDashboard = () => {
                             assets.profile
                         }
                         data={user}
+                        setImagePreview={setImagePreview}
                     />
                     
                     {/* Main Content Area */}
                     <div className="flex-1 transition-all duration-300 ease-in-out">
                         <Outlet context={{ 
                             user, 
-                            imagePreview, 
+                            image: imagePreview || (user.image && `${url}${user.image}`) || assets.profile,
                             setImagePreview 
                         }} />
                     </div>
