@@ -187,7 +187,7 @@ export const CartProvider = ({ children }) => {
                 });
             }
 
-            toast.success(`${sanitizedItem.product.name} ${MESSAGES.success.add}`);
+            // toast.success(`${sanitizedItem.product.name} ${MESSAGES.success.add}`);
         } catch (error) {
             console.error('Add to cart error:', error);
             setCartState(prev => ({ ...prev, isLoading: false, error: error.message }));
