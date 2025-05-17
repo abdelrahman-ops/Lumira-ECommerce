@@ -1,13 +1,24 @@
 import { memo, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import Title from "../common/Title";
 import ProductCard from "../product/card/ProductCard";
 import InlineLoader from "../utility/InlineLoader";
 import { fetchProducts } from "../../services/api";
+import { FiArrowRight } from "react-icons/fi";
 
 const Latest = () => {
     const [latestCollection, setLatestCollection] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    
+    const isProductNew = (createdAt) => {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 365);
+        
+        return new Date(createdAt) > thirtyDaysAgo;
+    };
 
     useEffect(() => {
         const loadLatestProducts = async () => {
@@ -28,38 +39,64 @@ const Latest = () => {
         loadLatestProducts();
     }, []);
 
+    
+
+    const handleViewAll = () => {
+        navigate("/collection");
+    };
+
     return (
-        <div className="my-10">
-            <div className="text-center">
+        <div className="my-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div className="text-center mb-12">
                 <Title text1="LATEST" text2="COLLECTION" />
-                <p className="mx-auto text-gray-600 text-sm max-w-md">
+                <motion.p 
+                    className="mx-auto text-gray-600 text-sm sm:text-base max-w-md"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
                     Fresh arrivals just for you
-                </p>
+                </motion.p>
             </div>
 
             {loading ? (
-                <div className="flex justify-center mt-8">
+                <motion.div 
+                    className="flex justify-center mt-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                >
                     <InlineLoader
-                        size = "xl"
+                        size="xl"
                         color="primary"
                         showText={true}
-                        text="Loading Our Best Sellers..." 
+                        text="Loading New Arrivals..." 
                         className="my-8"
                     />
-                </div>
+                </motion.div>
             ) : error ? (
-                <div className="text-center mt-8">
-                    <p className="text-red-500 mb-2">{error}</p>
-                    <button 
+                <motion.div 
+                    className="text-center mt-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                >
+                    <p className="text-red-500 mb-4">{error}</p>
+                    <motion.button 
                         onClick={() => window.location.reload()}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                     >
                         Try again
-                    </button>
-                </div>
+                    </motion.button>
+                </motion.div>
             ) : latestCollection.length > 0 ? (
                 <>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+                    <motion.div 
+                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ staggerChildren: 0.1 }}
+                    >
                         {latestCollection.map((product) => (
                             <ProductCard
                                 key={product._id}
@@ -69,19 +106,36 @@ const Latest = () => {
                                 image={product.image[0]}
                                 sizes={product.sizes}
                                 rating={product.rating}
+                                bestseller={product.bestseller}
+                                isNew={isProductNew(product.createdAt || product.date)}
                             />
                         ))}
-                    </div>
-                    <div className="text-center mt-8">
-                        <button className="text-sm text-blue-600 hover:underline">
-                            View all new arrivals →
-                        </button>
-                    </div>
+                    </motion.div>
+                    <motion.div 
+                        className="text-center mt-12"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                    >
+                        <motion.button 
+                            onClick={handleViewAll}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <span>View all new arrivals</span>
+                            <FiArrowRight className="w-4 h-4" />
+                        </motion.button>
+                    </motion.div>
                 </>
             ) : (
-                <div className="text-center mt-8 text-gray-500">
+                <motion.div 
+                    className="text-center mt-8 text-gray-500 "
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                >
                     No new products available
-                </div>
+                </motion.div>
             )}
         </div>
     );
