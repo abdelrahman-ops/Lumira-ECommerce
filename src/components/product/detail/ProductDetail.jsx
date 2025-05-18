@@ -76,10 +76,10 @@ const ProductDetail = () => {
                 size: selectedSize || 'One Size',
                 quantity: quantity
             };
-            console.log("from detail: ",cartItem);
+            // console.log("from detail: ",cartItem);
             
     
-            console.log("Adding to cart:", cartItem); // Debug log
+            // console.log("Adding to cart:", cartItem);
             await addToCart(cartItem);
             
             toast.success(
@@ -113,14 +113,14 @@ const ProductDetail = () => {
 
 
     const toggleWishlist = async () => {
-        console.log('Current wishlist status:', isWishlisted); // Debug
+        // console.log('Current wishlist status:', isWishlisted)
         try {
           if (isWishlisted) {
-            console.log('Removing from wishlist...'); // Debug
+            // console.log('Removing from wishlist...');
             await removeItem(product._id, 'default', product.name);
             // toast.success(`${product.name} removed from wishlist 💔`);
           } else {
-            console.log('Adding to wishlist...'); // Debug
+            // console.log('Adding to wishlist...');
             await addItem({
               _id: product._id,
               name: product.name,
@@ -129,9 +129,9 @@ const ProductDetail = () => {
             }, 'default');
             // toast.success(`${product.name} added to wishlist ❤️`);
           }
-          console.log('Wishlist operation completed'); // Debug
+        //   console.log('Wishlist operation completed');
         } catch (error) {
-          console.error("Wishlist error:", error); // Debug
+        //   console.error("Wishlist error:", error); // Debug
           toast.error(error.message || "Failed to update wishlist");
         }
       };

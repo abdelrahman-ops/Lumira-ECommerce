@@ -10,7 +10,8 @@ import { useCart } from "../../../context/CartContext";
 import { useWishlistContext } from "../../../context/WishlistContext";
 import { url } from "../../constant/URL";
 import ProductBadge from "./ProductBadge";
-
+import { FaOpencart } from 'react-icons/fa';
+import { MdErrorOutline } from "react-icons/md";
 const ProductCard = ({
     _id,
     name,
@@ -30,6 +31,7 @@ const ProductCard = ({
     const [isWishlistProcessing, setIsWishlistProcessing] = useState(false);
     const { isInWishlist, addItem, removeItem } = useWishlistContext();
     const isFavorite = useMemo(() => isInWishlist(_id, 'default'), [_id, isInWishlist]);
+    const [isHovered, setIsHovered] = useState(false);
 
     const imageUrl = useMemo(() => 
         image ? `${url}${image}` : "/fallback-image.jpg",
@@ -47,10 +49,10 @@ const ProductCard = ({
         try {
             if (isFavorite) {
                 await removeItem(_id, 'default', name);
-                toast.success('Removed from wishlist');
+                // toast.success('Removed from wishlist');
             } else {
                 await addItem({_id, name, price, image}, 'default');
-                toast.success('Added to wishlist');
+                // toast.success('Added to wishlist');
             }
         } catch (error) {
             toast.error(error.message || "Failed to update wishlist");
@@ -78,16 +80,14 @@ const ProductCard = ({
             
             await addToCart(cartItem);
             setShowSizes(false);
-            toast.success(
-                `${name}${selectedSize ? ` (Size: ${selectedSize})` : ""} added to cart 🛒`,
+            toast.success( `${name}${selectedSize ? ` (Size: ${selectedSize})` : ""} added to cart`,
                 {
-                    icon: '🛒',
-                    duration: 3000
+                    icon: <FaOpencart className="h-10 w-10 text-indigo-600" />,
                 }
             );
         } catch (error) {
             console.error("Add to cart error:", error);
-            toast.error(error.message || "Failed to add item to cart");
+            toast.error(error.message || "Failed to add item to cart" , {icon : <MdErrorOutline className="h-8 w-8" />});
         } finally {
             setIsAddingToCart(false);
         }
@@ -132,6 +132,8 @@ const ProductCard = ({
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
         >
             {/* Image Section */}
             <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
@@ -157,9 +159,6 @@ const ProductCard = ({
                         {discount}% OFF
                     </motion.div>
                 )}
-
-                {bestseller && <ProductBadge badges={["bestseller"]} />}
-                {isNew && <ProductBadge badges={["new"]} />}
 
                 {/* Action Buttons */}
                 <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -287,6 +286,9 @@ const ProductCard = ({
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {bestseller && <ProductBadge badges={["bestseller"]} isHovered={isHovered} />}
+            {isNew && <ProductBadge badges={["new"]} isHovered={isHovered} />}
         </motion.div>
     );
 };

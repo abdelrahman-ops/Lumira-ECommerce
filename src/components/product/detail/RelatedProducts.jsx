@@ -5,7 +5,7 @@ import ProductCard from "../card/ProductCard";
 import { useProductsQuery } from "../../../hooks/useProductsQuery"; // adjust this path
 
 const RelatedProducts = ({ category, currentProductId }) => {
-    console.log(category, currentProductId);
+    // console.log(category, currentProductId);
     
     const navigate = useNavigate();
     const { data: products, isLoading, isError } = useProductsQuery();
