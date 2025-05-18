@@ -35,9 +35,15 @@ API.interceptors.response.use(
         if (error.response?.status === 401) {
             // Handle token expiration
             Cookies.remove('token');
-            window.location.href = '/login';
+            // Store current location to redirect back after login
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/login') {
+                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+            } else {
+                window.location.href = '/login';
+            }
         }
-        return Promise.reject(error.response?.data?.message || 'Network error');
+        return Promise.reject(error.response?.data?.message || error.message || 'Network error');
     }
 );
 
@@ -61,7 +67,6 @@ export const addToUserCart = async (item: CartItem): Promise<CartResponse> => {
 
 export const fetchUserCart = async (): Promise<CartResponse> => {
     const { data } = await API.get('/cart/get-cart');
-    console.log("api.ts fetch cart data: ",data);
     return data;
 };
 
@@ -97,12 +102,6 @@ export const transferGuestCartToUser = async (
 };
 
 
-// User endpoints
-export const getUser = async (): Promise<User> => {
-    const { data } = await API.get('/users/profile');
-    console.log("api.ts fetch user data: ", data);
-    return data.user;
-};
 
 // Auth endpoints
 export const loginUser = async (
@@ -113,12 +112,26 @@ export const loginUser = async (
     return data;
 };
 
-export const registerUser = async (formData: FormData) => {
+export const loginWithGoogle = async (credential: string): Promise<{ user: User; token: string }> => {
+    const { data } = await API.post('/auth/google', { credential });
+    // console.log('loginwithgoogle data: ',data);
+    return data;
+};
+
+export const registerUser = async (formData: FormData): Promise<{ user: User; token: string }> => {
     const { data } = await API.post('/auth/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
     return data;
 };
+
+// User endpoints
+export const getUser = async (): Promise<User> => {
+    const { data } = await API.get('/users/profile');
+    // console.log("api.ts fetch user data: ", data);
+    return data.user;
+};
+
 
 export const updateUser = async (formData: FormData) => {
     const { data } = await API.put('/users/update', formData, {
@@ -132,10 +145,13 @@ export const deleteUser = async () => {
     return data;
 }
 
-export const updatePassword = async (oldPassword: string, newPassword: string) => {
+export const updatePassword = async (
+    oldPassword: string, 
+    newPassword: string
+): Promise<{ success: boolean }> => {
     const { data } = await API.put('/users/update-password', { oldPassword, newPassword });
     return data;
-}
+};
 
 
 // Wishlist endpoints
