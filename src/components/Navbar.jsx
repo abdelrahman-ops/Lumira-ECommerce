@@ -7,13 +7,12 @@ import '../css/Nav.css';
 import { useData } from '../context/DataContext';
 import { 
     FaSearch, 
-    // FaUserCircle,
     FaStore,
     FaInfoCircle,
     FaEnvelope,
     FaLaptopCode
 } from "react-icons/fa";
-import { PiUserCircleDashedThin ,PiUserCircleDuotone } from "react-icons/pi";
+import { PiUserCircleDashedThin, PiUserCircleDuotone } from "react-icons/pi";
 import { FaCartShopping } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
@@ -49,6 +48,41 @@ const Navbar = () => {
         open: { x: 0, transition: { type: "spring", stiffness: 300, damping: 30 } },
         closed: { x: "100%", transition: { type: "spring", stiffness: 300, damping: 30 } }
     };
+
+    const ProfileIcon = () => {
+    const [imageError, setImageError] = useState(false);
+    const { isAuthenticated } = useAuth();
+    const { user } = useData();
+
+    if (!isAuthenticated) {
+        return (
+            <div className="relative">
+                <PiUserCircleDuotone className="w-8 h-8" />
+            </div>
+        );
+    }
+
+    if (!user?.image || imageError) {
+        return (
+            <div className="relative">
+                <PiUserCircleDashedThin className="w-8 h-8 text-blue-600" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative">
+            <img 
+                src={user.image} 
+                alt="User profile" 
+                className="w-8 h-8 rounded-full border-2 border-blue-900 object-cover"
+                onError={() => setImageError(true)}
+            />
+            <div className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></div>
+        </div>
+    );
+};
 
     return (
         <div className="relative py-5 m-0 font-medium bg-white z-50">
@@ -125,18 +159,14 @@ const Navbar = () => {
                         </motion.div>
                     </NavLink>
                     
-                    {/* Profile Icon - Changes based on auth state */}
+                    {/* Profile Icon - Enhanced with better image handling */}
                     <motion.div
                         whileHover={{ scale: 1.2 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={handleLoginClick}
-                        className="cursor-pointer text-blue-950"
+                        className="cursor-pointer text-blue-950 relative"
                     >
-                        {isAuthenticated ? (
-                            <PiUserCircleDuotone  className="w-8 h-8 text-blue-600" />
-                        ) : (
-                            <PiUserCircleDashedThin  className="w-8 h-8" />
-                        )}
+                        <ProfileIcon />
                     </motion.div>
 
                     {/* Cart Icon with badge */}
@@ -260,21 +290,6 @@ const Navbar = () => {
                                 </li>
                             </ul>
                         </nav>
-
-                        {/* {isAuthenticated && (
-                            <div className="p-4 border-t bg-red">
-                                <button 
-                                    onClick={() => {
-                                        handleNavLinkClick();
-                                        navigate(`/profile/${user._id}`);
-                                    }}
-                                    className="flex items-center gap-3 w-full px-6 py-2 text-gray-700 hover:bg-gray-50 rounded"
-                                >
-                                    <FaUserCircle className="text-blue-600 text-lg" />
-                                    <span>MY PROFILE</span>
-                                </button>
-                            </div>
-                        )} */}
                     </div>
                 </motion.aside>
             </div>

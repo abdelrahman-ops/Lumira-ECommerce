@@ -2,12 +2,13 @@ import { FiCheckCircle, FiShoppingBag, FiHeadphones, FiAward, FiTruck, FiShield 
 import { assets } from '../assets/assets';
 import Settler from '../components/home/Sletter';
 import Title from './../components/common/Title';
+import LuxuryHeader from "../components/LuxuryHeader";
 
 const About = () => {
     return (
         <div className="bg-gradient-to-b from-white to-gray-50">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 py-10">
+            {/* <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 py-10">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10">
                     <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-blue-200 filter blur-3xl"></div>
                     <div className="absolute bottom-10 right-20 w-64 h-64 rounded-full bg-indigo-200 filter blur-3xl"></div>
@@ -20,7 +21,14 @@ const About = () => {
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
+
+            <LuxuryHeader 
+                title1="OUR"
+                title2="Story"
+                description="Discover the journey behind Lumière and our passion for redefining luxury fashion"
+                // ctaText="View Products"
+            />
 
             {/* Content Section */}
             <div className="container mx-auto px-4 py-5">

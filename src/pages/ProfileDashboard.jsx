@@ -45,7 +45,7 @@ const ProfileDashboard = () => {
         if (!user.image) return assets.profile;
         
         // Check if it's a Google image URL
-        if (typeof user.image === 'string' && user.image.includes('googleusercontent.com')) {
+        if (typeof user.image === 'string' && user.image.includes('googleusercontent.com') || user.image.includes('cloudinary.com')) {
             return user.image;
         }
         

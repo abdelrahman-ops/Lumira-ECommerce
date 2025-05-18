@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -15,6 +16,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { loginUser } from '../services/api';
 import { useData } from '../context/DataContext';
 import Title from '../components/common/Title';
+import {url} from '../components/constant/URL';
 
 const Login = () => {
     const { login, storeUserData } = useData();
@@ -49,7 +51,7 @@ const Login = () => {
             const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
             // console.log('Decoded Credential:', credentialResponseDecoded);
 
-            const response = await axios.post('http://localhost:5000/api/auth/google', {
+            const response = await axios.post(`${url}/api/auth/google`, {
                 credential: credentialResponse.credential
             }, {
                 headers: {

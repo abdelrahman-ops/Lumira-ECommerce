@@ -1,14 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
 import { FiMapPin, FiPhone, FiMail, FiClock, FiArrowRight } from "react-icons/fi";
 import { assets } from '../assets/assets';
-import Title from './../components/common/Title';
+
 import Settler from '../components/home/Sletter';
+import LuxuryHeader from "../components/LuxuryHeader";
 
 const Contact = () => {
     return (
         <div className="bg-gradient-to-b from-white to-gray-50">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 py-10">
+            {/* <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 py-10">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10">
                     <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-blue-200 filter blur-3xl"></div>
                     <div className="absolute bottom-10 right-20 w-64 h-64 rounded-full bg-indigo-200 filter blur-3xl"></div>
@@ -21,7 +22,13 @@ const Contact = () => {
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
+
+            <LuxuryHeader
+                title1="Contact"
+                title2="US"
+                description="Connect with our luxury concierge team for personalized assistance"
+            />
 
             {/* Contact Content */}
             <div className="container mx-auto px-4 py-20">

@@ -2,12 +2,12 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { useProductsQuery } from "../hooks/useProductsQuery";
 import ProductCard from "../components/product/card/ProductCard";
-import Title from "../components/common/Title";
 import InlineLoader from "../components/utility/InlineLoader";
 import { useSearchParams } from "react-router-dom";
 import SearchBar from "../components/utility/SearchBar";
 import { FiSearch, FiFilter, FiX, FiChevronDown, FiCheck, FiAlertCircle, FiFrown } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import LuxuryHeader from "../components/LuxuryHeader";
 
 const Collection = () => {
     const [showFilters, setShowFilters] = useState(false);
@@ -22,8 +22,7 @@ const Collection = () => {
     
     const isProductNew = (createdAt) => {
         const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 3);
-        
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         return new Date(createdAt) > thirtyDaysAgo;
     };
 
@@ -103,73 +102,32 @@ const Collection = () => {
     const subCategories = ["Topwear", "Bottomwear", "Winterwear"];
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen ">
             {/* Hero Section */}
-            <motion.div 
-                className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 py-16"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="absolute inset-0 opacity-10">
-                    <motion.div 
-                        className="absolute top-20 left-20 w-64 h-64 rounded-full bg-blue-200 filter blur-3xl"
-                        animate={{
-                            x: [0, 20, 0],
-                            y: [0, 20, 0]
-                        }}
-                        transition={{
-                            duration: 15,
-                            repeat: Infinity,
-                            repeatType: "reverse"
-                        }}
-                    />
-                    <motion.div 
-                        className="absolute bottom-10 right-20 w-64 h-64 rounded-full bg-indigo-200 filter blur-3xl"
-                        animate={{
-                            x: [0, -20, 0],
-                            y: [0, -20, 0]
-                        }}
-                        transition={{
-                            duration: 15,
-                            repeat: Infinity,
-                            repeatType: "reverse",
-                            delay: 5
-                        }}
-                    />
-                </div>
-                <div className="container mx-auto px-4 relative z-10">
-                    <motion.div 
-                        className="text-center mb-1"
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        <Title text1={"OUR"} text2={"Collection"} />
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
-                            Discover timeless pieces crafted with exceptional attention to detail
-                        </p>
-                    </motion.div>
-                </div>
-            </motion.div>
+            <LuxuryHeader
+                title1="OUR"
+                title2="Collection"
+                description="Discover timeless pieces crafted with exceptional attention to detail."
+                ctaText="View Products"
+            />
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-0 py-12 -mt-16 relative z-10">
                 {/* Search and Filter Controls */}
                 <motion.div 
                     className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 lg:px-8"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
                 >
                     {/* Search Button */}
                     <motion.button
-                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all"
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all ${showSearch ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-gray-700 shadow-sm hover:shadow-md'}`}
                         onClick={() => {
                             setShowSearch(!showSearch);
                             if (showSearch) setSearchTerm("");
                         }}
                         aria-label={showSearch ? "Close search" : "Open search"}
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ scale: showSearch ? 1 : 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         {showSearch ? (
@@ -184,14 +142,14 @@ const Collection = () => {
 
                     {/* Filter Button (Mobile) */}
                     <motion.button
-                        className="md:hidden flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm hover:shadow-md transition-all"
+                        className="md:hidden flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-full shadow-sm hover:shadow-md transition-all"
                         onClick={() => setShowFilters(!showFilters)}
                         aria-expanded={showFilters}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <FiFilter className="w-5 h-5 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">Filters</span>
+                        <FiFilter className="w-5 h-5" />
+                        <span className="text-sm font-medium">Filters</span>
                     </motion.button>
 
                     {/* Sort Dropdown */}
@@ -199,7 +157,7 @@ const Collection = () => {
                         <span className="text-sm text-gray-600 hidden sm:block">Sort by:</span>
                         <div className="relative">
                             <select
-                                className="appearance-none bg-white border border-gray-300 text-gray-700 py-2 pl-4 pr-8 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:shadow-md transition-all"
+                                className="appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 pl-4 pr-8 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:shadow-md transition-all"
                                 onChange={(e) => setSortBy(e.target.value)}
                                 value={sortBy}
                             >
@@ -218,11 +176,11 @@ const Collection = () => {
                 <AnimatePresence>
                     {showSearch && (
                         <motion.div 
-                            className="mb-8"
+                            className="mb-10"
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
                         >
                             <SearchBar
                                 onSearch={handleSearch}
@@ -234,12 +192,12 @@ const Collection = () => {
                     )}
                 </AnimatePresence>
 
-                <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex flex-col lg:flex-row gap-8 ">
                     {/* Filters Sidebar */}
                     <AnimatePresence>
                         {(showFilters || window.innerWidth >= 1024) && (
                             <motion.div 
-                                className={`lg:w-72 bg-white rounded-xl shadow-md p-6 h-fit lg:sticky lg:top-8 ${showFilters ? "block" : "hidden lg:block"}`}
+                                className={`lg:w-72 bg-white rounded-xl shadow-md p-6 h-fit lg:sticky lg:top-8 ${showFilters ? "block" : "hidden lg:block"} border-2`}
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 exit={{ x: -20, opacity: 0 }}
