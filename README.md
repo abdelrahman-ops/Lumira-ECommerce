@@ -66,7 +66,9 @@ The app will run on `http://localhost:5173/`.
 5. **Responsive UI**: Works seamlessly across devices.
 
 ## 📸 Screenshots
-![image](https://github.com/user-attachments/assets/f5469ca7-9592-40c2-ab7c-b8701fedaafa)![image](https://github.com/user-attachments/assets/8f27dd7e-87cf-4d75-bd2a-240bf45a83ec)
+![image](https://github.com/user-attachments/assets/b4301c65-084e-4827-8099-62a6f0fc8051)
+![image](https://github.com/user-attachments/assets/4cd4e66f-5a69-4915-a45c-7747d7ed35a4)
+
 
 
 
