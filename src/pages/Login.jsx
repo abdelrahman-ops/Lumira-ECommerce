@@ -1,56 +1,83 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useLocation, useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
-import { useData } from '../context/DataContext';
-import Title from '../components/common/Title';
-import { loginUser } from '../services/api';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
-import { FaXTwitter } from "react-icons/fa6";
+import { FaXTwitter, FaSpinner } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
+import { loginUser } from '../services/api';
+import { useData } from '../context/DataContext';
+import Title from '../components/common/Title';
 
 const Login = () => {
     const { login, storeUserData } = useData();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
     const handleLoginSuccess = async (token, user) => {
         try {
             Cookies.set("token", token, { 
                 expires: 7, 
-                // secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict'
             });
+            // console.log(token);
+            
             login(token);
             storeUserData(user);
             
-            toast.success("Welcome back! Login successful", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            });
+            toast.success("Welcome back! Login successful");
             
             const redirectPath = location.state?.from?.pathname || '/';
             navigate(redirectPath);
         } catch (error) {
             console.error("Login success handler error:", error);
-            toast.error("An error occurred after login. Please refresh the page.", {
-                position: "top-center"
-            });
+            toast.error("An error occurred after login. Please refresh the page.");
         }
     };
 
-    // Enhanced validation schema
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setIsGoogleLoading(true);
+        try {
+            const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
+            // console.log('Decoded Credential:', credentialResponseDecoded);
+
+            const response = await axios.post('http://localhost:5000/api/auth/google', {
+                credential: credentialResponse.credential
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            // console.log('response: ',response.data.data.token);
+            
+            
+            if (response?.data?.data?.token) {
+                await handleLoginSuccess(response.data.data.token, response.data.data.user);
+                // console.log('response.data.token',response);
+                return;
+            }
+            // If we get here, something was wrong with the response
+            throw new Error(response?.data?.message || "Invalid response from server");
+        } catch (error) {
+            console.error("Google login error:", error);
+            toast.error(error.response?.data?.message || "Google login failed. Please try again.");
+        } finally {
+            setIsGoogleLoading(false);
+        }
+    };
+
+    const handleGoogleError = () => {
+        toast.error("Google login failed. Please try again.");
+    };
+
     const schema = Yup.object().shape({
         email: Yup.string()
             .email("Please enter a valid email address")
@@ -60,35 +87,28 @@ const Login = () => {
             .required("Password is required")
     });
 
-    // Form handling
     const formikLogin = useFormik({
-        initialValues: {
-            email: "",
-            password: "",
-        },
+        initialValues: { email: "", password: "" },
         validationSchema: schema,
         onSubmit: async (values, { setSubmitting, setFieldError }) => {
             try {
                 setSubmitting(true);
-                
                 const response = await loginUser(values.email, values.password);
 
-                if (response?.status && response.data) {
+                if (response?.data?.token) {
                     await handleLoginSuccess(response.data.token, response.data.user);
+                    // console.log('response.data.token',response.data.token);
                 } else {
-                    // Handle specific field errors from API
                     if (response?.errors) {
                         Object.entries(response.errors).forEach(([field, message]) => {
                             setFieldError(field, message);
                         });
                     }
-                    throw new Error(response?.message || "Invalid credentials");
+                    throw new Error(response?.data?.message || "Invalid credentials");
                 }
             } catch (error) {
                 console.error("Login error:", error);
-                toast.error(error.message || "Login failed. Please check your credentials and try again.", {
-                    position: "top-center"
-                });
+                toast.error(error.response?.data?.message || "Login failed. Please check your credentials.");
             } finally {
                 setSubmitting(false);
             }
@@ -103,12 +123,11 @@ const Login = () => {
         navigate('/forgot-password');
     };
 
-    // Pre-fill email if coming from registration
     useEffect(() => {
         if (location.state?.registeredEmail) {
             formikLogin.setFieldValue('email', location.state.registeredEmail);
         }
-    }, [location.state,formikLogin]);
+    }, [location.state, formikLogin]);
 
     return (
         <motion.div
@@ -132,62 +151,58 @@ const Login = () => {
                     </div>
 
                     <form className="space-y-5" onSubmit={formikLogin.handleSubmit}>
-                        <motion.div 
-                            className="space-y-1"
-                            whileHover={{ y: -2 }}
-                            transition={{ duration: 0.2 }}
-                        >
+                        <motion.div className="space-y-1" whileHover={{ y: -2 }}>
                             <div className="relative">
                                 <MdEmail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'/>
                                 <input
                                     type="email"
                                     name="email"
-                                    className={`w-full pl-10 pr-4 py-3 border ${formikLogin.errors.email ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
+                                    className={`w-full pl-10 pr-4 py-3 border ${
+                                        formikLogin.errors.email ? 'border-red-300' : 'border-gray-300'
+                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
                                     placeholder="Email Address"
                                     value={formikLogin.values.email}
                                     onChange={formikLogin.handleChange}
                                     onBlur={formikLogin.handleBlur}
                                     disabled={formikLogin.isSubmitting}
                                 />
+                                {formikLogin.touched.email && formikLogin.errors.email && (
+                                    <motion.p 
+                                        className="text-xs text-red-500 mt-1"
+                                        initial={{ opacity: 0, y: -5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                    >
+                                        {formikLogin.errors.email}
+                                    </motion.p>
+                                )}
                             </div>
-                            {formikLogin.touched.email && formikLogin.errors.email && (
-                                <motion.p 
-                                    className="text-xs text-red-500"
-                                    initial={{ opacity: 0, y: -5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                >
-                                    {formikLogin.errors.email}
-                                </motion.p>
-                            )}
                         </motion.div>
 
-                        <motion.div 
-                            className="space-y-1"
-                            whileHover={{ y: -2 }}
-                            transition={{ duration: 0.2 }}
-                        >
+                        <motion.div className="space-y-1" whileHover={{ y: -2 }}>
                             <div className="relative">
                                 <RiLockPasswordFill className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="password"
                                     name="password"
-                                    className={`w-full pl-10 pr-4 py-3 border ${formikLogin.errors.password ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
+                                    className={`w-full pl-10 pr-4 py-3 border ${
+                                        formikLogin.errors.password ? 'border-red-300' : 'border-gray-300'
+                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
                                     placeholder="Password"
                                     value={formikLogin.values.password}
                                     onChange={formikLogin.handleChange}
                                     onBlur={formikLogin.handleBlur}
                                     disabled={formikLogin.isSubmitting}
                                 />
+                                {formikLogin.touched.password && formikLogin.errors.password && (
+                                    <motion.p 
+                                        className="text-xs text-red-500 mt-1"
+                                        initial={{ opacity: 0, y: -5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                    >
+                                        {formikLogin.errors.password}
+                                    </motion.p>
+                                )}
                             </div>
-                            {formikLogin.touched.password && formikLogin.errors.password && (
-                                <motion.p 
-                                    className="text-xs text-red-500"
-                                    initial={{ opacity: 0, y: -5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                >
-                                    {formikLogin.errors.password}
-                                </motion.p>
-                            )}
                         </motion.div>
 
                         <div className="flex items-center justify-between pt-1">
@@ -217,16 +232,13 @@ const Login = () => {
                         <motion.button
                             type="submit"
                             className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
-                            whileHover={{ scale: 1.02, boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)" }}
+                            whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={formikLogin.isSubmitting}
                         >
                             {formikLogin.isSubmitting ? (
                                 <>
-                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
+                                    <FaSpinner className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
                                     Signing In...
                                 </>
                             ) : (
@@ -257,14 +269,28 @@ const Login = () => {
                                 <FaXTwitter className="w-5 h-5"/>
                             </motion.button>
 
-                            <motion.button
-                                type="button"
-                                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                whileHover={{ y: -2 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <FcGoogle className="w-5 h-5"/>
-                            </motion.button>
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={handleGoogleError}
+                                useOneTap
+                                render={({ onClick }) => (
+                                    <motion.button
+                                        type="button"
+                                        className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        whileHover={{ y: -2 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={onClick}
+                                        disabled={isGoogleLoading}
+                                    >
+                                        {isGoogleLoading ? (
+                                            <FaSpinner className="animate-spin mr-2 h-4 w-4" />
+                                        ) : (
+                                            <FcGoogle className="mr-2 h-5 w-5" />
+                                        )}
+                                        Google
+                                    </motion.button>
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

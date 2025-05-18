@@ -283,8 +283,9 @@ const OrderForm = () => {
                 <div className="w-full">
                     <div className="text-2xl">
                         <div className="inline-flex gap-2 items-center mb-3">
-                            <p className="text-gray-500">CART <span className="text-gray-700 font-medium">TOTALS</span></p>
-                            <div className="w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gray-700"></div>
+                            <div className="text-xl sm:text-2xl my-3">
+                                <Title text1={"CART"} text2={"TOTALS"} />
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2 mt-2 text-sm">

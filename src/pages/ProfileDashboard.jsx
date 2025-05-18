@@ -38,6 +38,23 @@ const ProfileDashboard = () => {
         return <ProfileLoader sections={['basic', 'detailed']} />;
     }
 
+    // Safe image URL handling
+    const getImageUrl = () => {
+        if (imagePreview) return imagePreview;
+        
+        if (!user.image) return assets.profile;
+        
+        // Check if it's a Google image URL
+        if (typeof user.image === 'string' && user.image.includes('googleusercontent.com')) {
+            return user.image;
+        }
+        
+        // Handle local image path
+        return `${url}${user.image}`;
+    };  
+
+    const profileImageUrl = getImageUrl();
+
     return (
         <div className="min-h-screen">
             <div className="container mx-auto px-4">
@@ -45,9 +62,7 @@ const ProfileDashboard = () => {
                     {/* Sidebar */}
                     <ProfileSidebar
                         image={
-                            imagePreview ||
-                            (user.image && `${url}${user.image}`) ||
-                            assets.profile
+                            profileImageUrl
                         }
                         data={user}
                         setImagePreview={setImagePreview}
@@ -57,7 +72,7 @@ const ProfileDashboard = () => {
                     <div className="flex-1 transition-all duration-300 ease-in-out">
                         <Outlet context={{ 
                             user, 
-                            image: imagePreview || (user.image && `${url}${user.image}`) || assets.profile,
+                            image: profileImageUrl,
                             setImagePreview 
                         }} />
                     </div>
