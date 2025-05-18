@@ -28,6 +28,7 @@ const Navbar = () => {
     const [visible, setVisible] = useState(false);
 
     const handleLoginClick = () => {
+        // console.log('isAuthenticated nav? ',isAuthenticated);
         if (isAuthenticated) {
             navigate(`/profile/${user._id}/`);
         } else {
