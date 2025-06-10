@@ -7,6 +7,7 @@ import  {
     WishlistResponse,
     MoveToCartResponse,
     User,
+    GoogleCredentialResponse ,
 } from '../types/types'
 import { url } from '../components/constant/URL';
 
@@ -112,9 +113,8 @@ export const loginUser = async (
     return data;
 };
 
-export const loginWithGoogle = async (credential: string): Promise<{ user: User; token: string }> => {
-    const { data } = await API.post('/auth/google', { credential });
-    // console.log('loginwithgoogle data: ',data);
+export const loginWithGoogle = async (credentialResponse: GoogleCredentialResponse): Promise<{ user: User; token: string }> => {
+    const { data } = await API.post('/auth/google', { credential: credentialResponse.credential });
     return data;
 };
 
@@ -165,6 +165,7 @@ export const addToWishlist = async (
     size: string
 ): Promise<WishlistResponse> => {
     const { data } = await API.post('/wishlist', { productId, size });
+    console.log("wtf")
     return data;
 };
 

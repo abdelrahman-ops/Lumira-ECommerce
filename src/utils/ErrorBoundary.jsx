@@ -1,26 +1,25 @@
-/* eslint-disable no-unused-vars */
-import { Component } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-class ErrorBoundary extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { hasError: false };
-    }
+const ErrorBoundary = ({ children }) => {
+    const navigate = useNavigate();
 
-    static getDerivedStateFromError(error) {
-        return { hasError: true };
-    }
+    useEffect(() => {
+        const errorHandler = (error) => {
+        console.error('Error caught by error boundary:', error);
+        navigate('/500');
+        };
 
-    componentDidCatch(error, errorInfo) {
-        console.error('Error caught by ErrorBoundary:', error, errorInfo);
-    }
+        window.addEventListener('error', errorHandler);
+        window.addEventListener('unhandledrejection', errorHandler);
 
-    render() {
-        if (this.state.hasError) {
-            return <h1>Something went wrong. Please try again later.</h1>;
-        }
-        return this.props.children;
-    }
-}
+        return () => {
+        window.removeEventListener('error', errorHandler);
+        window.removeEventListener('unhandledrejection', errorHandler);
+        };
+    }, [navigate]);
+
+    return children;
+};
 
 export default ErrorBoundary;

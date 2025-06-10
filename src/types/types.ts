@@ -130,6 +130,14 @@ interface UserResponse {
     message?: string;
 }
 
+interface UserUpdateForm {
+	name?: string;
+	password?: string;
+	image?: string;
+	phone?: string;
+    gender?: string;
+}
+
 // Auth Types
 interface LoginCredentials {
     email: string;
@@ -183,6 +191,12 @@ interface OrderResponse {
     message?: string;
 }
 
+interface GoogleCredentialResponse {
+    credential: string;
+    clientId: string;
+    select_by: string;
+}
+
 // Export all types
 export type {
     Product,
@@ -195,6 +209,7 @@ export type {
     WishlistResponse,
     MoveToCartResponse,
     User,
+    UserUpdateForm,
     UserAddress,
     UserPaymentMethod,
     UserResponse,
@@ -205,5 +220,8 @@ export type {
     OrderItem,
     Order,
     OrderResponse,
-    MinimalProduct
+    MinimalProduct,
+    GoogleCredentialResponse
 };
+
+
