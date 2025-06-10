@@ -9,20 +9,33 @@ import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { FaXTwitter, FaSpinner } from "react-icons/fa6";
+import { FaXTwitter, FaSpinner, FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
-import { MdEmail } from "react-icons/md";
+import { MdEmail, MdShoppingBag } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { loginUser } from '../services/api';
-import { useData } from '../context/DataContext';
+import { useUserStore } from '../stores/userStore';
 import Title from '../components/common/Title';
-import {url} from '../components/constant/URL';
+import { url } from '../components/constant/URL';
+import EmptyCartIllustration from '../components/illustrations/EmptyCartIllustration';
+import { useAuthStore } from '../stores/authStore';
 
 const Login = () => {
-    const { login, storeUserData } = useData();
+    const { storeUserData } = useUserStore();
+    const { login } = useAuthStore();
     const navigate = useNavigate();
     const location = useLocation();
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleLoginSuccess = async (token, user) => {
         try {
@@ -30,13 +43,12 @@ const Login = () => {
                 expires: 7, 
                 sameSite: 'strict'
             });
-            // console.log(token);
             
             login(token);
             storeUserData(user);
             
             toast.success("Welcome back! Login successful");
-            
+            window.location.reload();
             const redirectPath = location.state?.from?.pathname || '/';
             navigate(redirectPath);
         } catch (error) {
@@ -49,8 +61,6 @@ const Login = () => {
         setIsGoogleLoading(true);
         try {
             const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
-            // console.log('Decoded Credential:', credentialResponseDecoded);
-
             const response = await axios.post(`${url}/api/auth/google`, {
                 credential: credentialResponse.credential
             }, {
@@ -58,15 +68,11 @@ const Login = () => {
                     'Content-Type': 'application/json'
                 }
             });
-            // console.log('response: ',response.data.data.token);
-            
             
             if (response?.data?.data?.token) {
                 await handleLoginSuccess(response.data.data.token, response.data.data.user);
-                // console.log('response.data.token',response);
                 return;
             }
-            // If we get here, something was wrong with the response
             throw new Error(response?.data?.message || "Invalid response from server");
         } catch (error) {
             console.error("Google login error:", error);
@@ -99,7 +105,6 @@ const Login = () => {
 
                 if (response?.data?.token) {
                     await handleLoginSuccess(response.data.token, response.data.user);
-                    // console.log('response.data.token',response.data.token);
                 } else {
                     if (response?.errors) {
                         Object.entries(response.errors).forEach(([field, message]) => {
@@ -125,6 +130,10 @@ const Login = () => {
         navigate('/forgot-password');
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     useEffect(() => {
         if (location.state?.registeredEmail) {
             formikLogin.setFieldValue('email', location.state.registeredEmail);
@@ -133,19 +142,67 @@ const Login = () => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-center border rounded-xl shadow-xl"
         >
-            <motion.div 
-                className="w-full max-w-md"
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-            >
-                <div className="bg-white p-8 rounded-xl shadow-xl border border-gray-200">
+            <div className="w-full max-w-6xl flex flex-col md:flex-row rounded-xl overflow-hidden bg-white ">
+                {/* Left side - Brand/Product showcase (hidden on mobile) */}
+                {!isMobile && (
+                    <motion.div 
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                        className="hidden md:flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 w-1/2"
+                    >
+                        <div className="mb-8 flex items-center">
+                            <MdShoppingBag className="text-4xl mr-2" />
+                            <span className="text-2xl font-bold">Lumira</span>
+                        </div>
+                        <motion.div 
+                            className="text-center"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+                            <p className="mb-6">Sign in to access your personalized shopping experience, wishlist, and order history.</p>
+                            <div className="flex justify-center">
+                                <div className="w-16 h-1 bg-blue-300 rounded-full"></div>
+                            </div>
+                        </motion.div>
+                        <motion.div 
+                            className="mt-8"
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.6 }}
+                        >
+                            <EmptyCartIllustration 
+                                width={300}
+                                height={300}
+                                primaryColor="#103783"
+                                secondaryColor="#9bafd9"
+                                className="mb-6"
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+
+                {/* Right side - Login form */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="w-full md:w-1/2 p-6 sm:p-8 md:p-10"
+                >
                     <div className="text-center mb-8">
+                        {isMobile && (
+                            <div className="flex justify-center items-center mb-4">
+                                <MdShoppingBag className="text-3xl text-blue-600 mr-2" />
+                                <span className="text-xl font-bold text-gray-800">Lumira</span>
+                            </div>
+                        )}
                         <Title text1="Welcome" text2="Back" />
                         <p className="mt-2 text-sm text-gray-600">
                             Sign in to access your account and continue shopping
@@ -153,16 +210,24 @@ const Login = () => {
                     </div>
 
                     <form className="space-y-5" onSubmit={formikLogin.handleSubmit}>
-                        <motion.div className="space-y-1" whileHover={{ y: -2 }}>
+                        <motion.div 
+                            className="space-y-1" 
+                            whileHover={{ y: -2 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                        >
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                Email Address
+                            </label>
                             <div className="relative">
                                 <MdEmail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'/>
                                 <input
+                                    id="email"
                                     type="email"
                                     name="email"
                                     className={`w-full pl-10 pr-4 py-3 border ${
                                         formikLogin.errors.email ? 'border-red-300' : 'border-gray-300'
-                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
-                                    placeholder="Email Address"
+                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400`}
+                                    placeholder="your@email.com"
                                     value={formikLogin.values.email}
                                     onChange={formikLogin.handleChange}
                                     onBlur={formikLogin.handleBlur}
@@ -180,21 +245,37 @@ const Login = () => {
                             </div>
                         </motion.div>
 
-                        <motion.div className="space-y-1" whileHover={{ y: -2 }}>
+                        <motion.div 
+                            className="space-y-1" 
+                            whileHover={{ y: -2 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                        >
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                                Password
+                            </label>
                             <div className="relative">
                                 <RiLockPasswordFill className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
-                                    type="password"
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
-                                    className={`w-full pl-10 pr-4 py-3 border ${
+                                    className={`w-full pl-10 pr-10 py-3 border ${
                                         formikLogin.errors.password ? 'border-red-300' : 'border-gray-300'
-                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
-                                    placeholder="Password"
+                                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400`}
+                                    placeholder="••••••••"
                                     value={formikLogin.values.password}
                                     onChange={formikLogin.handleChange}
                                     onBlur={formikLogin.handleBlur}
                                     disabled={formikLogin.isSubmitting}
                                 />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    onClick={togglePasswordVisibility}
+                                    tabIndex="-1"
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </button>
                                 {formikLogin.touched.password && formikLogin.errors.password && (
                                     <motion.p 
                                         className="text-xs text-red-500 mt-1"
@@ -211,29 +292,29 @@ const Login = () => {
                             <motion.button
                                 type="button"
                                 onClick={handleForgotPassword}
-                                className="text-sm text-blue-600 hover:text-blue-500"
+                                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
                                 whileHover={{ x: 2 }}
+                                whileTap={{ scale: 0.95 }}
                                 disabled={formikLogin.isSubmitting}
                             >
-                                Forgot your password?
+                                Forgot password?
                             </motion.button>
                             <motion.button
                                 type="button"
                                 onClick={handleCreateAccountClick}
-                                className="text-sm text-blue-600 hover:text-blue-500 flex items-center gap-1"
+                                className="text-sm text-blue-600 hover:text-blue-500 font-medium flex items-center gap-1"
                                 whileHover={{ x: 2 }}
+                                whileTap={{ scale: 0.95 }}
                                 disabled={formikLogin.isSubmitting}
                             >
                                 Create account
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
+                                <FaArrowRight className="w-3 h-3" />
                             </motion.button>
                         </div>
 
                         <motion.button
                             type="submit"
-                            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+                            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={formikLogin.isSubmitting}
@@ -249,7 +330,7 @@ const Login = () => {
                         </motion.button>
                     </form>
 
-                    <div className="mt-6">
+                    <div className="mt-8">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-300"></div>
@@ -264,11 +345,12 @@ const Login = () => {
                         <div className="mt-6 grid grid-cols-2 gap-3">
                             <motion.button
                                 type="button"
-                                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                                 whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                <FaXTwitter className="w-5 h-5"/>
+                                <FaXTwitter className="w-5 h-5 text-black"/>
+                                {!isMobile && <span className="ml-2">Twitter</span>}
                             </motion.button>
 
                             <GoogleLogin
@@ -278,7 +360,7 @@ const Login = () => {
                                 render={({ onClick }) => (
                                     <motion.button
                                         type="button"
-                                        className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                                         whileHover={{ y: -2 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={onClick}
@@ -287,16 +369,22 @@ const Login = () => {
                                         {isGoogleLoading ? (
                                             <FaSpinner className="animate-spin mr-2 h-4 w-4" />
                                         ) : (
-                                            <FcGoogle className="mr-2 h-5 w-5" />
+                                            <FcGoogle className="w-5 h-5" />
                                         )}
-                                        Google
+                                        {!isMobile && <span className="ml-2">Google</span>}
                                     </motion.button>
                                 )}
                             />
                         </div>
                     </div>
-                </div>
-            </motion.div>
+
+                    {isMobile && (
+                        <div className="mt-8 text-center text-xs text-gray-500">
+                            By continuing, you agree to our Terms of Service and Privacy Policy
+                        </div>
+                    )}
+                </motion.div>
+            </div>
         </motion.div>
     );
 };

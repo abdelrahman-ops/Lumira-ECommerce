@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useAuth } from "../context/AuthContext";
+
 import { useData } from "../context/DataContext";
 // import PhoneNumberInput from "../hooks/PhoneNumberInput";
 import Title from '../components/common/Title';
@@ -16,10 +16,12 @@ import {
     FiLoader,
 } from "react-icons/fi";
 import { IoMaleOutline, IoFemaleOutline, } from "react-icons/io5";
+import { useUserStore } from "../stores/userStore";
+import { useAuthStore } from "../stores/authStore";
 
 const Register = () => {
-    const { login } = useAuth();
-    const { storeUserData } = useData();
+    const { storeUserData } = useUserStore();
+    const { login } = useAuthStore();
     const navigate = useNavigate();
     const location = useLocation();
     const [showPassword, setShowPassword] = useState(false);

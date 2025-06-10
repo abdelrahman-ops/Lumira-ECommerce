@@ -1,9 +1,9 @@
-import { useAuth } from "../../context/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useAuthStore } from "../../stores/authStore";
 
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuthStore();
     const location = useLocation();
 
     

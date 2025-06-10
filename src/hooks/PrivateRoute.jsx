@@ -1,10 +1,10 @@
-
 import { Navigate , useLocation } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+
 import Cookies from "js-cookie";
+import { useAuthStore } from '../stores/authStore';
 
 const PrivateRoute = ({ children }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuthStore();
     const location = useLocation();
 
     const token = Cookies.get("token");
