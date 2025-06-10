@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { assets } from "../assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
-import '../css/Nav.css';
-import { useData } from '../context/DataContext';
 import { 
     FaSearch, 
     FaStore,
@@ -18,18 +14,27 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import { RiAdminFill } from "react-icons/ri";
 import { motion } from "framer-motion";
+import { useAuthStore } from "../stores/authStore";
+import { useCart } from '../context/CartContext';
+import { useUserStore } from '../stores/userStore';
+
+import '../css/Nav.css';
+
+
 
 const Navbar = () => {
+    const { isAuthenticated } = useAuthStore();
+    const { user } = useUserStore();
+    // console.log('user form nav: ', user)
     const { totalQuantity } = useCart();
-    const { isAuthenticated } = useAuth();
-    const { user } = useData();
+    // console.log("navbar is auth? ", isAuthenticated);
+    
     const navigate = useNavigate();
     const [visible, setVisible] = useState(false);
 
     const handleLoginClick = () => {
-        // console.log('isAuthenticated nav? ',isAuthenticated);
         if (isAuthenticated) {
-            navigate(`/profile/${user._id}/`);
+            navigate(`/profile/me`);
         } else {
             navigate('/login', { state: { showSignUp: false } });
         }
@@ -43,7 +48,6 @@ const Navbar = () => {
         setVisible(false);
     };
 
-    // Animation variants
     const menuVariants = {
         open: { x: 0, transition: { type: "spring", stiffness: 300, damping: 30 } },
         closed: { x: "100%", transition: { type: "spring", stiffness: 300, damping: 30 } }
@@ -51,8 +55,6 @@ const Navbar = () => {
 
     const ProfileIcon = () => {
     const [imageError, setImageError] = useState(false);
-    const { isAuthenticated } = useAuth();
-    const { user } = useData();
 
     if (!isAuthenticated) {
         return (
