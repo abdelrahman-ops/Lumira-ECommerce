@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Cookies from 'js-cookie';
-import { useNavigate, NavLink, useLocation, useParams } from 'react-router-dom';
-import { useData } from '../../context/DataContext';
+import { useNavigate, NavLink, useLocation } from 'react-router-dom';
 import { 
     FiUser, FiShoppingBag, FiHeart, FiSettings, FiLogOut,
     FiCreditCard, FiMapPin, FiBell, FiChevronRight, FiChevronLeft,FiChevronDown
 } from 'react-icons/fi';
+import { useAuthStore } from '../../stores/authStore';
 
 const ProfileSidebar = ({ image, data }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { id } = useParams();
-    const { logout } = useData();
+    const { logout } = useAuthStore();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isSwiping, setIsSwiping] = useState(false);
     const [startX, setStartX] = useState(0);
@@ -31,12 +30,13 @@ const ProfileSidebar = ({ image, data }) => {
         if (confirmLogout) {
             Cookies.remove('token');
             logout();
+            window.location.reload();
             navigate('/login');
         }
     };
 
     const menuItems = [
-        { name: 'Profile', icon: <FiUser size={18} />, section: '', path: '' },
+        { name: 'Profile', icon: <FiUser size={18} />, section: 'me', path: 'me' },
         { name: 'Orders', icon: <FiShoppingBag size={18} />, section: 'orders', path: 'orders' },
         { name: 'Wishlist', icon: <FiHeart size={18} />, section: 'wishlist', path: 'wishlist' },
         { name: 'Payments', icon: <FiCreditCard size={18} />, section: 'payment', path: 'payment' },
@@ -66,7 +66,7 @@ const ProfileSidebar = ({ image, data }) => {
             const newIndex = diff > 0 
                 ? Math.min(currentIndex + 1, menuItems.length - 1) 
                 : Math.max(currentIndex - 1, 0);
-            navigate(`/profile/${id}/${menuItems[newIndex].path}`);
+            navigate(`/profile/${menuItems[newIndex].path}`);
         }
     };
 
@@ -130,7 +130,7 @@ const ProfileSidebar = ({ image, data }) => {
                         {menuItems.map((item) => (
                             <NavLink
                                 key={item.section}
-                                to={`/profile/${id}/${item.path}`}
+                                to={`/profile/${item.path}`}
                                 end={item.path === ''}
                             >
                                 {({ isActive }) => (
@@ -186,7 +186,7 @@ const ProfileSidebar = ({ image, data }) => {
                         {menuItems.slice(0, 4).map((item) => (
                             <NavLink
                                 key={item.section}
-                                to={`/profile/${id}/${item.path}`}
+                                to={`/profile/${item.path}`}
                                 end={item.path === ''}
                                 className={({ isActive }) => 
                                     `flex flex-col items-center p-2 rounded-lg transition-all ${
@@ -213,7 +213,7 @@ const ProfileSidebar = ({ image, data }) => {
                                 {menuItems.slice(4).map((item) => (
                                     <NavLink
                                         key={item.section}
-                                        to={`/profile/${id}/${item.path}`}
+                                        to={`/profile/${item.path}`}
                                         className={({ isActive }) => 
                                             `flex items-center gap-2 p-3 hover:bg-gray-50 ${
                                                 isActive ? 'text-blue-600' : 'text-gray-600'

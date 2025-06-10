@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '../../../context/DataContext';
 import { toast } from 'react-toastify';
 import { updatePassword, deleteUser } from '../../../services/api';
+import { useUserStore } from '../../../stores/userStore';
+import { useAuthStore } from '../../../stores/authStore';
 
 interface PasswordFields {
     current: string;
@@ -30,7 +32,8 @@ interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = () => {
-    const { logout, user, fetchUserData } = useData();
+    const { user, fetchUserData } = useUserStore();
+    const {logout} = useAuthStore();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<string>('general');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
