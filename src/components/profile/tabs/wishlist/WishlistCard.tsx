@@ -62,7 +62,7 @@ const WishlistCard = ({
         try {
             if (isWishlisted) {
                 removeItem(_id, 'default', name);
-                toast.success('Removed from wishlist');
+                // toast.success('Removed from wishlist');
             } else {
                 addItem({
                     _id,

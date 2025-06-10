@@ -16,6 +16,7 @@ import {
 import { MinimalProduct, WishlistItem } from '../types/types';
 import { useData } from '../context/DataContext';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../stores/authStore';
 
 interface WishlistContextType {
     wishlist: WishlistItem[];
@@ -39,7 +40,7 @@ const useWishlistLogic = (): WishlistContextType => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [hasMigrated, setHasMigrated] = useState(false);
-    const { isAuthenticated } = useData();
+    const { isAuthenticated } = useAuthStore();
 
     const getGuestWishlist = useCallback((): WishlistItem[] => {
         try {
